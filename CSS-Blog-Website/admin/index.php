@@ -1,8 +1,18 @@
 <?php
 require_once '../config.php';
 
+// Start session
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
 // Fetch statistics for dashboard
 $stats = [
+    'users' => $conn->query('SELECT COUNT(*) as count FROM users')->fetch_assoc()['count'],
     'posts' => $conn->query('SELECT COUNT(*) as count FROM posts')->fetch_assoc()['count'],
     'about' => $conn->query('SELECT COUNT(*) as count FROM about')->fetch_assoc()['count'],
     'community' => $conn->query('SELECT COUNT(*) as count FROM community')->fetch_assoc()['count'],
@@ -33,6 +43,12 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
         
         <!-- Statistics Cards -->
         <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-user"></i>
+                <h3>Users</h3>
+                <p class="stat-number"><?= $stats['users'] ?></p>
+                <a href="#" class="stat-link">Manage Users</a>
+            </div>
             <div class="stat-card">
                 <i class="fas fa-blog"></i>
                 <h3>Blog Posts</h3>

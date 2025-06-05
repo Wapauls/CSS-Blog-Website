@@ -32,5 +32,9 @@ $current_page = str_replace('.php', '', $current_file);
             <i class="fas fa-code"></i>
             <span>Developers</span>
         </a>
+        <a href="logout.php">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
     </nav>
 </div> 
