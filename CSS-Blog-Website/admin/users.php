@@ -3,6 +3,9 @@ require_once '../config.php';
 // Start session
 session_start();
 
+// Set page title
+$title = "Manage Users"; 
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -116,82 +119,75 @@ $entries = $conn->query('SELECT * FROM users ORDER BY id DESC');
 
 // Get current page for active state
 $current_page = 'users';
+
+// Start buffering the content
+ob_start();
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin - Users</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <!-- Include Sidebar -->
-    <?php include 'includes/sidebar.php'; ?>
+<!-- Main Content -->
+<div class="main-content">
+    <?php if ($message): ?>
+        <div class="message"><?= $message ?></div>
+    <?php endif; ?>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <?php if ($message): ?>
-            <div class="message"><?= $message ?></div>
+    <h1>User Management</h1>
+    <h2><?= $edit ? 'Edit User Entry' : 'Add New User Entry' ?></h2>
+    <form method="post" enctype="multipart/form-data">
+        <?php if ($edit): ?>
+            <input type="hidden" name="id" value="<?= $edit_entry['id'] ?>">
         <?php endif; ?>
+        <label>Email:<br><input type="email" name="email" required value="<?= $edit ? htmlspecialchars($edit_entry['email']) : '' ?>"></label><br><br>
+        <label>Username:<br><input type="text" name="username" required value="<?= $edit ? htmlspecialchars($edit_entry['username']) : '' ?>"></label><br><br>
+        <label>First Name:<br><input type="text" name="first_name" required value="<?= $edit ? htmlspecialchars($edit_entry['first_name']) : '' ?>"></label><br><br>
+        <label>Middle Name:<br><input type="text" name="middle_name" value="<?= $edit ? htmlspecialchars($edit_entry['middle_name']) : '' ?>"></label><br><br>
+        <label>Last Name:<br><input type="text" name="last_name" required value="<?= $edit ? htmlspecialchars($edit_entry['last_name']) : '' ?>"></label><br><br>
+        <label>
+            <?php if ($edit): ?>Reset Password:<br>
+            <?php else: ?>Password:<br>
+            <?php endif; ?>
+        <input type="password" name="password" <?= $edit ? '' : 'required' ?>>
+        <?php if ($edit): ?>
+            <small>Leave blank to keep the existing password.</small>
+        <?php endif; ?>
+        </label><br><br>
+        <label>Image:<br><input type="file" name="image" accept="image/*"></label>
+        <?php if ($edit && $edit_entry['profile_image']): ?>
+            <br><img src="../uploads/<?= htmlspecialchars($edit_entry['profile_image']) ?>" alt="" style="max-width:100px;">
+        <?php endif; ?>
+        <br><br>
+        <label for="is_admin">Access Admin Panel:  <input class="option-input checkbox" type="checkbox" name="is_admin" <?= $edit && $edit_entry['is_admin'] ? 'checked' : '' ?>></label>
+        <br><br>
+        <button type="submit"><?= $edit ? 'Update Entry' : 'Add Entry' ?></button>
+        <?php if ($edit): ?>
+            <a href="users.php">Cancel</a>
+        <?php endif; ?>
+    </form>
 
-        <h1>Admin Approval Panel</h1>
-        <h2><?= $edit ? 'Edit User Entry' : 'Add New User Entry' ?></h2>
-        <form method="post" enctype="multipart/form-data">
-            <?php if ($edit): ?>
-                <input type="hidden" name="id" value="<?= $edit_entry['id'] ?>">
-            <?php endif; ?>
-            <label>Email:<br><input type="email" name="email" required value="<?= $edit ? htmlspecialchars($edit_entry['email']) : '' ?>"></label><br><br>
-            <label>Username:<br><input type="text" name="username" required value="<?= $edit ? htmlspecialchars($edit_entry['username']) : '' ?>"></label><br><br>
-            <label>First Name:<br><input type="text" name="first_name" required value="<?= $edit ? htmlspecialchars($edit_entry['first_name']) : '' ?>"></label><br><br>
-            <label>Middle Name:<br><input type="text" name="middle_name" value="<?= $edit ? htmlspecialchars($edit_entry['middle_name']) : '' ?>"></label><br><br>
-            <label>Last Name:<br><input type="text" name="last_name" required value="<?= $edit ? htmlspecialchars($edit_entry['last_name']) : '' ?>"></label><br><br>
-            <label>
-                <?php if ($edit): ?>Reset Password:<br>
-                <?php else: ?>Password:<br>
-                <?php endif; ?>
-            <input type="password" name="password" <?= $edit ? '' : 'required' ?>>
-            <?php if ($edit): ?>
-                <small>Leave blank to keep the existing password.</small>
-            <?php endif; ?>
-            </label><br><br>
-            <label>Image:<br><input type="file" name="image" accept="image/*"></label>
-            <?php if ($edit && $edit_entry['profile_image']): ?>
-                <br><img src="../uploads/<?= htmlspecialchars($edit_entry['profile_image']) ?>" alt="" style="max-width:100px;">
-            <?php endif; ?>
-            <br><br>
-            <label for="is_admin">Access Admin Panel:  <input class="option-input checkbox" type="checkbox" name="is_admin" <?= $edit && $edit_entry['is_admin'] ? 'checked' : '' ?>></label>
-            <br><br>
-            <button type="submit"><?= $edit ? 'Update Entry' : 'Add Entry' ?></button>
-            <?php if ($edit): ?>
-                <a href="users.php">Cancel</a>
-            <?php endif; ?>
-        </form>
-
-        <h2>All User Entries</h2>
-        <table>
+    <h2>All User Entries</h2>
+    <table>
+        <tr>
+            <th>Image</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+            <th>Created At</th>
+        </tr>
+        <?php while ($row = $entries->fetch_assoc()): ?>
             <tr>
-                <th>Image</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Actions</th>
-                <th>Created At</th>
+                <td><?php if ($row['profile_image']): ?><img src="../uploads/<?= htmlspecialchars($row['profile_image']) ?>" style="max-width:80px; aspect-ratio: 1/1; object-fit:cover;"/><?php endif; ?></td>
+                <td><?= htmlspecialchars($row['first_name']) ?></td>
+                <td><?= htmlspecialchars($row['last_name']) ?></td>
+                <td><?= nl2br(htmlspecialchars($row['email'])) ?></td>
+                <td>
+                    <a href="?edit=<?= $row['id'] ?>">Edit</a> |
+                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this entry?');">Delete</a>
+                </td>
+                <td><?= $row['created_at'] ?></td>
             </tr>
-            <?php while ($row = $entries->fetch_assoc()): ?>
-                <tr>
-                    <td><?php if ($row['profile_image']): ?><img src="../uploads/<?= htmlspecialchars($row['profile_image']) ?>" style="max-width:80px;"/><?php endif; ?></td>
-                    <td><?= htmlspecialchars($row['first_name']) ?></td>
-                    <td><?= htmlspecialchars($row['last_name']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($row['email'])) ?></td>
-                    <td>
-                        <a href="?edit=<?= $row['id'] ?>">Edit</a> |
-                        <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this entry?');">Delete</a>
-                    </td>
-                    <td><?= $row['created_at'] ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </table>
-    </div>
-</body>
-</html> 
+        <?php endwhile; ?>
+    </table>
+</div>
+<?php
+$content = ob_get_clean();
+include 'includes/base.php'; 

@@ -3,6 +3,9 @@ require_once '../config.php';
 // Start session
 session_start();
 
+// Set page title
+$title = "About Management";
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -92,66 +95,60 @@ $entries = $conn->query('SELECT * FROM about ORDER BY id DESC');
 
 // Get current page for active state
 $current_page = 'about';
+
+// Start buffering the content
+ob_start();
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin - About</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <!-- Include Sidebar -->
-    <?php include 'includes/sidebar.php'; ?>
+<!-- Main Content -->
+<div class="main-content">
+    <?php if ($message): ?>
+        <div class="message"><?= $message ?></div>
+    <?php endif; ?>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <?php if ($message): ?>
-            <div class="message"><?= $message ?></div>
+    <h1>About Management</h1>
+    <h2><?= $edit ? 'Edit About Entry' : 'Add New About Entry' ?></h2>
+    <form method="post" enctype="multipart/form-data">
+        <?php if ($edit): ?>
+            <input type="hidden" name="id" value="<?= $edit_entry['id'] ?>">
         <?php endif; ?>
+        <label>Title:<br><input type="text" name="title" required value="<?= $edit ? htmlspecialchars($edit_entry['title']) : '' ?>"></label><br><br>
+        <label>Content:<br><textarea name="content" required><?= $edit ? htmlspecialchars($edit_entry['content']) : '' ?></textarea></label><br><br>
+        <label>Image:<br><input type="file" name="image" accept="image/*"></label>
+        <?php if ($edit && $edit_entry['image']): ?>
+            <br><img src="../uploads/<?= htmlspecialchars($edit_entry['image']) ?>" alt="" style="max-width:100px;">
+        <?php endif; ?>
+        <br><br>
+        <button type="submit"><?= $edit ? 'Update Entry' : 'Add Entry' ?></button>
+        <?php if ($edit): ?>
+            <a href="about.php">Cancel</a>
+        <?php endif; ?>
+    </form>
 
-        <h1>About Management</h1>
-        <h2><?= $edit ? 'Edit About Entry' : 'Add New About Entry' ?></h2>
-        <form method="post" enctype="multipart/form-data">
-            <?php if ($edit): ?>
-                <input type="hidden" name="id" value="<?= $edit_entry['id'] ?>">
-            <?php endif; ?>
-            <label>Title:<br><input type="text" name="title" required value="<?= $edit ? htmlspecialchars($edit_entry['title']) : '' ?>"></label><br><br>
-            <label>Content:<br><textarea name="content" required><?= $edit ? htmlspecialchars($edit_entry['content']) : '' ?></textarea></label><br><br>
-            <label>Image:<br><input type="file" name="image" accept="image/*"></label>
-            <?php if ($edit && $edit_entry['image']): ?>
-                <br><img src="../uploads/<?= htmlspecialchars($edit_entry['image']) ?>" alt="" style="max-width:100px;">
-            <?php endif; ?>
-            <br><br>
-            <button type="submit"><?= $edit ? 'Update Entry' : 'Add Entry' ?></button>
-            <?php if ($edit): ?>
-                <a href="about.php">Cancel</a>
-            <?php endif; ?>
-        </form>
-
-        <h2>All About Entries</h2>
-        <table>
+    <h2>All About Entries</h2>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Image</th>
+            <th>Actions</th>
+            <th>Created At</th>
+        </tr>
+        <?php while ($row = $entries->fetch_assoc()): ?>
             <tr>
-                <th>Title</th>
-                <th>Content</th>
-                <th>Image</th>
-                <th>Actions</th>
-                <th>Created At</th>
+                <td><?= htmlspecialchars($row['title']) ?></td>
+                <td><?= nl2br(htmlspecialchars($row['content'])) ?></td>
+                <td><?php if ($row['image']): ?><img src="../uploads/<?= htmlspecialchars($row['image']) ?>" style="max-width:80px;"/><?php endif; ?></td>
+                <td>
+                    <a href="?edit=<?= $row['id'] ?>">Edit</a> |
+                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this entry?');">Delete</a>
+                </td>
+                <td><?= $row['created_at'] ?></td>
             </tr>
-            <?php while ($row = $entries->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['title']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($row['content'])) ?></td>
-                    <td><?php if ($row['image']): ?><img src="../uploads/<?= htmlspecialchars($row['image']) ?>" style="max-width:80px;"/><?php endif; ?></td>
-                    <td>
-                        <a href="?edit=<?= $row['id'] ?>">Edit</a> |
-                        <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this entry?');">Delete</a>
-                    </td>
-                    <td><?= $row['created_at'] ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </table>
-    </div>
-</body>
-</html> 
+        <?php endwhile; ?>
+    </table>
+</div>
+
+<?php
+$content = ob_get_clean();
+include 'includes/base.php'; 

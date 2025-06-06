@@ -3,6 +3,9 @@ require_once '../config.php';
 // Start session
 session_start();
 
+// Set page title
+$title = "Admin - Blog Posts";
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -90,66 +93,61 @@ $posts = $conn->query('SELECT * FROM posts ORDER BY created_at DESC');
 
 // Get current page for active state
 $current_page = 'home';
+
+// Start buffering the content
+ob_start();
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin - Blog Posts</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <!-- Include Sidebar -->
-    <?php include 'includes/sidebar.php'; ?>
+<!-- Main Content -->
+<div class="main-content">
+    <?php if ($message): ?>
+        <div class="message"><?= $message ?></div>
+    <?php endif; ?>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <?php if ($message): ?>
-            <div class="message"><?= $message ?></div>
+    <h1>Blog Posts Management</h1>
+    <h2><?= $edit ? 'Edit Post' : 'Add New Post' ?></h2>
+    <form method="post" enctype="multipart/form-data">
+        <?php if ($edit): ?>
+            <input type="hidden" name="id" value="<?= $edit_post['id'] ?>">
         <?php endif; ?>
+        <label>Title:<br><input type="text" name="title" required value="<?= $edit ? htmlspecialchars($edit_post['title']) : '' ?>"></label><br><br>
+        <label>Content:<br><textarea name="content" required><?= $edit ? htmlspecialchars($edit_post['content']) : '' ?></textarea></label><br><br>
+        <label>Image:<br><input type="file" name="image" accept="image/*"></label>
+        <?php if ($edit && $edit_post['image']): ?>
+            <br><img src="../uploads/<?= htmlspecialchars($edit_post['image']) ?>" alt="" style="max-width:100px;">
+        <?php endif; ?>
+        <br><br>
+        <button type="submit"><?= $edit ? 'Update Post' : 'Add Post' ?></button>
+        <?php if ($edit): ?>
+            <a href="home.php">Cancel</a>
+        <?php endif; ?>
+    </form>
 
-        <h1>Blog Posts Management</h1>
-        <h2><?= $edit ? 'Edit Post' : 'Add New Post' ?></h2>
-        <form method="post" enctype="multipart/form-data">
-            <?php if ($edit): ?>
-                <input type="hidden" name="id" value="<?= $edit_post['id'] ?>">
-            <?php endif; ?>
-            <label>Title:<br><input type="text" name="title" required value="<?= $edit ? htmlspecialchars($edit_post['title']) : '' ?>"></label><br><br>
-            <label>Content:<br><textarea name="content" required><?= $edit ? htmlspecialchars($edit_post['content']) : '' ?></textarea></label><br><br>
-            <label>Image:<br><input type="file" name="image" accept="image/*"></label>
-            <?php if ($edit && $edit_post['image']): ?>
-                <br><img src="../uploads/<?= htmlspecialchars($edit_post['image']) ?>" alt="" style="max-width:100px;">
-            <?php endif; ?>
-            <br><br>
-            <button type="submit"><?= $edit ? 'Update Post' : 'Add Post' ?></button>
-            <?php if ($edit): ?>
-                <a href="home.php">Cancel</a>
-            <?php endif; ?>
-        </form>
-
-        <h2>All Posts</h2>
-        <table>
+    <h2>All Posts</h2>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Image</th>
+            <th>Actions</th>
+            <th>Created At</th>
+        </tr>
+        <?php while ($row = $posts->fetch_assoc()): ?>
             <tr>
-                <th>Title</th>
-                <th>Content</th>
-                <th>Image</th>
-                <th>Actions</th>
-                <th>Created At</th>
+                <td><?= htmlspecialchars($row['title']) ?></td>
+                <td><?= nl2br(htmlspecialchars($row['content'])) ?></td>
+                <td><?php if ($row['image']): ?><img src="../uploads/<?= htmlspecialchars($row['image']) ?>" style="max-width:80px;"/><?php endif; ?></td>
+                <td>
+                    <a href="?edit=<?= $row['id'] ?>">Edit</a> |
+                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this post?');">Delete</a>
+                </td>
+                <td><?= $row['created_at'] ?></td>
             </tr>
-            <?php while ($row = $posts->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['title']) ?></td>
-                    <td><?= nl2br(htmlspecialchars($row['content'])) ?></td>
-                    <td><?php if ($row['image']): ?><img src="../uploads/<?= htmlspecialchars($row['image']) ?>" style="max-width:80px;"/><?php endif; ?></td>
-                    <td>
-                        <a href="?edit=<?= $row['id'] ?>">Edit</a> |
-                        <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete this post?');">Delete</a>
-                    </td>
-                    <td><?= $row['created_at'] ?></td>
-                </tr>
-            <?php endwhile; ?>
-        </table>
-    </div>
-</body>
-</html> 
+        <?php endwhile; ?>
+    </table>
+</div>
+<?php
+// Get the buffered content
+$content = ob_get_clean();
+// Include the base template
+include 'includes/base.php';
