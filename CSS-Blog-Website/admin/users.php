@@ -139,7 +139,7 @@ ob_start();
         <label>Email:<br><input type="email" name="email" required value="<?= $edit ? htmlspecialchars($edit_entry['email']) : '' ?>"></label><br><br>
         <label>Username:<br><input type="text" name="username" required value="<?= $edit ? htmlspecialchars($edit_entry['username']) : '' ?>"></label><br><br>
         <label>First Name:<br><input type="text" name="first_name" required value="<?= $edit ? htmlspecialchars($edit_entry['first_name']) : '' ?>"></label><br><br>
-        <label>Middle Name:<br><input type="text" name="middle_name" value="<?= $edit ? htmlspecialchars($edit_entry['middle_name']) : '' ?>"></label><br><br>
+        <label>Middle Name:<br><input type="text" name="middle_name" value="<?= $edit ? htmlspecialchars($edit_entry['middle_name'] ?? '') : '' ?>"></label><br><br>
         <label>Last Name:<br><input type="text" name="last_name" required value="<?= $edit ? htmlspecialchars($edit_entry['last_name']) : '' ?>"></label><br><br>
         <label>
             <?php if ($edit): ?>Reset Password:<br>
