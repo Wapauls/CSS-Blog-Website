@@ -47,7 +47,7 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
                 <i class="fas fa-user"></i>
                 <h3>Users</h3>
                 <p class="stat-number"><?= $stats['users'] ?></p>
-                <a href="#" class="stat-link">Manage Users</a>
+                <a href="users.php" class="stat-link">Manage Users</a>
             </div>
             <div class="stat-card">
                 <i class="fas fa-blog"></i>
