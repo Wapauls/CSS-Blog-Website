@@ -21,6 +21,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             // Check if user is an admin or not
             if ($user['is_admin'] == 1) {
+                
+                // Update last_login timestamp on successful login
+                $now = date("Y-m-d H:i:s");
+                $update_login = "UPDATE users SET last_login = ? WHERE id = ?";
+                $stmt = $conn->prepare($update_login);
+                $stmt->bind_param("si", $now, $user['id']);
+                $stmt->execute();
+                $stmt->close();
+
                 // Set session and redirect to admin dashboard
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
