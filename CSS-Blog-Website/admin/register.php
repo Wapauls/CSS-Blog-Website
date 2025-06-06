@@ -3,16 +3,11 @@ session_start();
 require '../config.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $image = '';
-    // Handle file upload and validate image
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $img_ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $random_name = uniqid('profile_', true) . '.' . $img_ext;
-        $target = '../uploads/' . $random_name;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            $image = $random_name;
-        }
+    // Validate email format
+    if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $error = "❌ Invalid email format.";
     }
+
     // Validate password match
     if ($_POST['password'] !== $_POST['confirm_password']) {
         $error = "❌ Passwords do not match.";
@@ -28,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
+    $image = '';
 
     // Check if there are any previous errors before proceeding
     if (!isset($error)) {
@@ -45,6 +41,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Only insert new user if there are still no errors
     if (!isset($error)) {
+
+        // Handle file upload and validate image
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $img_ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $random_name = uniqid('profile_', true) . '.' . $img_ext;
+            $target = '../uploads/' . $random_name;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                $image = $random_name;
+            }
+        }
+
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 

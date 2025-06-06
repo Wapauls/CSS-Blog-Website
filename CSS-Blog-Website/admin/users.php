@@ -54,8 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $image = $random_name;
         }
     }
+
+    // Validate email format
+    if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $error = "❌ Invalid email format.";
+    }
     
-    if (isset($_POST['id']) && $_POST['id']) {
+    // Proceed only if there are no errors
+    if (isset($_POST['id']) && $_POST['id'] && !isset($error)) {
         // Update
         $id = intval($_POST['id']);
 
