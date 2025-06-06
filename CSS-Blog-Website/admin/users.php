@@ -40,7 +40,7 @@ if (isset($_GET['edit'])) {
 // Handle Create or Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = $_POST['first_name'];
-    $middle_name = $_POST['middle_name'];
+    $middle_name = isset($_POST['middle_name']) && $_POST['middle_name'] !== null ? $_POST['middle_name'] : '';
     $last_name = $_POST['last_name'];
     $username = $_POST['username'];
     $email = $_POST['email'];
