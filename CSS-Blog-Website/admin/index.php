@@ -24,48 +24,57 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <!-- Include Sidebar -->
     <?php include 'includes/sidebar.php'; ?>
-
-    <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content modern-dashboard">
         <h1>Dashboard Overview</h1>
-        
-        <!-- Statistics Cards -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-blog"></i>
-                <h3>Blog Posts</h3>
-                <p class="stat-number"><?= $stats['posts'] ?></p>
-                <a href="home.php" class="stat-link">Manage Posts</a>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-info-circle"></i>
-                <h3>About Entries</h3>
-                <p class="stat-number"><?= $stats['about'] ?></p>
-                <a href="about.php" class="stat-link">Manage About</a>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-users"></i>
-                <h3>Community Updates</h3>
-                <p class="stat-number"><?= $stats['community'] ?></p>
-                <a href="community.php" class="stat-link">Manage Community</a>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-newspaper"></i>
-                <h3>News & Events</h3>
-                <p class="stat-number"><?= $stats['news'] ?></p>
-                <a href="news.php" class="stat-link">Manage News</a>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-code"></i>
-                <h3>Developers</h3>
-                <p class="stat-number"><?= $stats['developers'] ?></p>
-                <a href="developers.php" class="stat-link">Manage Developers</a>
-            </div>
+    <div class="stat-card">
+        <div class="stat-body">
+            <i class="fas fa-blog"></i>
+            <h3>Blog Posts</h3>
+            <p class="stat-number"><?= $stats['posts'] ?></p>
         </div>
+        <a href="blogpost.php" class="stat-link">Posts</a>
+    </div>
 
-        <!-- Recent Activity -->
+    <div class="stat-card">
+        <div class="stat-body">
+            <i class="fas fa-info-circle"></i>
+            <h3>About Entries</h3>
+            <p class="stat-number"><?= $stats['about'] ?></p>
+        </div>
+        <a href="about.php" class="stat-link">About</a>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-body">
+            <i class="fas fa-users"></i>
+            <h3>Community Updates</h3>
+            <p class="stat-number"><?= $stats['community'] ?></p>
+        </div>
+        <a href="community.php" class="stat-link">Community</a>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-body">
+            <i class="fas fa-newspaper"></i>
+            <h3>News & Events</h3>
+            <p class="stat-number"><?= $stats['news'] ?></p>
+        </div>
+        <a href="news.php" class="stat-link">News</a>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-body">
+            <i class="fas fa-code"></i>
+            <h3>Developers</h3>
+            <p class="stat-number"><?= $stats['developers'] ?></p>
+        </div>
+        <a href="developers.php" class="stat-link">Developers</a>
+    </div>
+</div>
+
+
         <div class="recent-activity">
             <div class="activity-section">
                 <h2>Recent Blog Posts</h2>
@@ -82,7 +91,6 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
                     <?php endif; ?>
                 </div>
             </div>
-
             <div class="activity-section">
                 <h2>Recent News & Events</h2>
                 <div class="activity-list">
@@ -98,7 +106,6 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
                     <?php endif; ?>
                 </div>
             </div>
-
             <div class="activity-section">
                 <h2>Recent Community Updates</h2>
                 <div class="activity-list">

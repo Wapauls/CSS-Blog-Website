@@ -12,7 +12,7 @@ $current_page = str_replace('.php', '', $current_file);
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard Overview</span>
         </a>
-        <a href="home.php" class="<?= $current_page === 'home' ? 'active' : '' ?>">
+        <a href="blogpost.php" class="<?= $current_page === 'home' ? 'active' : '' ?>">
             <i class="fas fa-blog"></i>
             <span>Blog Posts</span>
         </a>

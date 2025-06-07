@@ -37,7 +37,9 @@ switch($current_page) {
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="index.php" class="logo">CSS Blog</a>
+            <a href="index.php" class="logo">
+                <img src="../uploads/logo.png" />
+            </a>
             <div class="nav-links">
                 <a href="?page=home" class="<?= $current_page === 'home' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Home

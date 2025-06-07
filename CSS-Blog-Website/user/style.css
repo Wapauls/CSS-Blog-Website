@@ -14,7 +14,6 @@ body {
 
 /* Navigation Bar */
 .navbar {
-    background-color: #252424;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
@@ -24,24 +23,29 @@ body {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 2400px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2c3e50;
     text-decoration: none;
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    transform: translateX(50px);
 }
 
 .nav-links {
     display: flex;
     gap: 1.5rem;
+    height: 45px;
 }
 
 .nav-links a {
