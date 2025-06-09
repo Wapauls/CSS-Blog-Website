@@ -98,7 +98,7 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
                         <?php while ($news = $recent_news->fetch_assoc()): ?>
                             <div class="activity-item">
                                 <h4><?= htmlspecialchars($news['title']) ?></h4>
-                                <p class="activity-date">Event Date: <?= date('M j, Y', strtotime($news['event_date'])) ?></p>
+                                <p class="activity-date">Posted: <?= date('M j, Y', strtotime($news['created_at'])) ?></p>
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
@@ -113,7 +113,7 @@ $recent_community = $conn->query('SELECT * FROM community ORDER BY created_at DE
                         <?php while ($community = $recent_community->fetch_assoc()): ?>
                             <div class="activity-item">
                                 <h4><?= htmlspecialchars($community['title']) ?></h4>
-                                <p class="members-count"><?= number_format($community['members']) ?> members</p>
+                                <p class="activity-date">Posted: <?= date('M j, Y', strtotime($community['created_at'])) ?></p>
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>

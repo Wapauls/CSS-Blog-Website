@@ -34,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['title']) && isset($_POST['content'])) {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
-        $category = trim($_POST['category'] ?? '');
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -59,57 +58,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
             
             // Get the current image name before making any changes
-            $stmt = $conn->prepare('SELECT image FROM news WHERE id=?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $current_image = null;
-            if ($row = $result->fetch_assoc()) {
-                $current_image = $row['image'];
-            }
-            $stmt->close();
-            
-            // Prepare the update based on image state
-            if ($remove_image) {
-                // Remove image case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+            $stmt = $conn->prepare('SELECT image FROM news WHERE id = ?');
+            if ($stmt) {
+                $stmt->bind_param('i', $id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $current_image = null;
+                if ($row = $result->fetch_assoc()) {
+                    $current_image = $row['image'];
                 }
-                $stmt = $conn->prepare('UPDATE news SET title=?, content=?, category=?, image=NULL WHERE id=?');
-                $stmt->bind_param('sssi', $title, $content, $category, $id);
-            } else if ($image) {
-                // New image uploaded case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+                $stmt->close();
+                
+                // Prepare the update based on image state
+                if ($remove_image) {
+                    // Remove image case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE news SET title = ?, content = ?, image = NULL WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else if ($image) {
+                    // New image uploaded case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE news SET title = ?, content = ?, image = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('sssi', $title, $content, $image, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else {
+                    // No image change case
+                    $stmt = $conn->prepare('UPDATE news SET title = ?, content = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
                 }
-                $stmt = $conn->prepare('UPDATE news SET title=?, content=?, category=?, image=? WHERE id=?');
-                $stmt->bind_param('ssssi', $title, $content, $category, $image, $id);
-            } else {
-                // No image change case
-                $stmt = $conn->prepare('UPDATE news SET title=?, content=?, category=? WHERE id=?');
-                $stmt->bind_param('sssi', $title, $content, $category, $id);
             }
-            
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
-                exit();
-            } else {
-                $message = 'Update failed: ' . $stmt->error;
-            }
-            $stmt->close();
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO news (title, content, category, image) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssss', $title, $content, $category, $image);
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
-                exit();
+            $stmt = $conn->prepare('INSERT INTO news (title, content, image) VALUES (?, ?, ?)');
+            if ($stmt) {
+                $stmt->bind_param('sss', $title, $content, $image);
+                if ($stmt->execute()) {
+                    header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
+                    exit();
+                } else {
+                    $message = 'Error: ' . $stmt->error;
+                }
+                $stmt->close();
             } else {
-                $message = 'Error: ' . $stmt->error;
+                $message = 'Error preparing statement: ' . $conn->error;
             }
-            $stmt->close();
         }
     }
 }
@@ -181,9 +203,6 @@ $current_page = 'news';
                             </div>
                         <?php endif; ?>
                         <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
-                        <?php if ($row['category']): ?>
-                            <span class="post-category"><?= htmlspecialchars($row['category']) ?></span>
-                        <?php endif; ?>
                         <?php
                         $content = strip_tags($row['content']);
                         $truncated = mb_substr($content, 0, 105);
@@ -193,7 +212,7 @@ $current_page = 'news';
                         ?>
                         <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-category="<?= htmlspecialchars($row['category']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-date="<?= htmlspecialchars($row['event_date']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -281,7 +300,7 @@ $current_page = 'news';
                     id: btn.getAttribute('data-id'),
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
-                    category: btn.getAttribute('data-category'),
+                    date: btn.getAttribute('data-date'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -335,15 +354,11 @@ $current_page = 'news';
                         <form id="createPostForm" method="POST" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
-                                <input type="text" id="createTitle" name="title" placeholder="Enter article title" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="createCategory"><i class="fas fa-tag"></i> Category</label>
-                                <input type="text" id="createCategory" name="category" placeholder="Enter article category">
+                                <input type="text" id="createTitle" name="title" placeholder="Enter news title" required>
                             </div>
                             <div class="form-group">
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
-                                <textarea id="createContent" name="content" placeholder="Write your article content here..." required></textarea>
+                                <textarea id="createContent" name="content" placeholder="Write news content here..." required></textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Featured Image</label>
@@ -372,10 +387,6 @@ $current_page = 'news';
                             <div class="form-group">
                                 <label for="editTitle"><i class="fas fa-heading"></i> Title</label>
                                 <input type="text" id="editTitle" name="title" value="${data.title}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editCategory"><i class="fas fa-tag"></i> Category</label>
-                                <input type="text" id="editCategory" name="category" value="${data.category}">
                             </div>
                             <div class="form-group">
                                 <label for="editContent"><i class="fas fa-align-left"></i> Content</label>

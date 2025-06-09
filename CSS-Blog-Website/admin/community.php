@@ -31,10 +31,9 @@ if (isset($_GET['edit'])) {
 // Handle Create or Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Only proceed if title and content are set
-    if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['members'])) {
+    if (isset($_POST['title']) && isset($_POST['content'])) {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
-        $members = intval($_POST['members']);
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -59,57 +58,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
             
             // Get the current image name before making any changes
-            $stmt = $conn->prepare('SELECT image FROM community WHERE id=?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $current_image = null;
-            if ($row = $result->fetch_assoc()) {
-                $current_image = $row['image'];
-            }
-            $stmt->close();
-            
-            // Prepare the update based on image state
-            if ($remove_image) {
-                // Remove image case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+            $stmt = $conn->prepare('SELECT image FROM community WHERE id = ?');
+            if ($stmt) {
+                $stmt->bind_param('i', $id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $current_image = null;
+                if ($row = $result->fetch_assoc()) {
+                    $current_image = $row['image'];
                 }
-                $stmt = $conn->prepare('UPDATE community SET title=?, content=?, members=?, image=NULL WHERE id=?');
-                $stmt->bind_param('ssii', $title, $content, $members, $id);
-            } else if ($image) {
-                // New image uploaded case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+                $stmt->close();
+                
+                // Prepare the update based on image state
+                if ($remove_image) {
+                    // Remove image case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, image = NULL WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else if ($image) {
+                    // New image uploaded case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, image = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('sssi', $title, $content, $image, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else {
+                    // No image change case
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
                 }
-                $stmt = $conn->prepare('UPDATE community SET title=?, content=?, members=?, image=? WHERE id=?');
-                $stmt->bind_param('ssisi', $title, $content, $members, $image, $id);
-            } else {
-                // No image change case
-                $stmt = $conn->prepare('UPDATE community SET title=?, content=?, members=? WHERE id=?');
-                $stmt->bind_param('ssii', $title, $content, $members, $id);
             }
-            
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
-                exit();
-            } else {
-                $message = 'Update failed: ' . $stmt->error;
-            }
-            $stmt->close();
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO community (title, content, members, image) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssis', $title, $content, $members, $image);
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
-                exit();
+            $stmt = $conn->prepare('INSERT INTO community (title, content, image) VALUES (?, ?, ?)');
+            if ($stmt) {
+                $stmt->bind_param('sss', $title, $content, $image);
+                if ($stmt->execute()) {
+                    header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
+                    exit();
+                } else {
+                    $message = 'Error: ' . $stmt->error;
+                }
+                $stmt->close();
             } else {
-                $message = 'Error: ' . $stmt->error;
+                $message = 'Error preparing statement: ' . $conn->error;
             }
-            $stmt->close();
         }
     }
 }
@@ -190,7 +212,7 @@ $current_page = 'community';
                         ?>
                         <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-members="<?= intval($row['members']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -278,7 +300,6 @@ $current_page = 'community';
                     id: btn.getAttribute('data-id'),
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
-                    members: btn.getAttribute('data-members'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -332,15 +353,11 @@ $current_page = 'community';
                         <form id="createPostForm" method="POST" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
-                                <input type="text" id="createTitle" name="title" placeholder="Enter entry title" required>
+                                <input type="text" id="createTitle" name="title" placeholder="Enter community title" required>
                             </div>
                             <div class="form-group">
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
-                                <textarea id="createContent" name="content" placeholder="Write your entry content here..." required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="createMembers"><i class="fas fa-users"></i> Members Count</label>
-                                <input type="number" id="createMembers" name="members" placeholder="Enter number of members" required min="0">
+                                <textarea id="createContent" name="content" placeholder="Write community content here..." required></textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Featured Image</label>
@@ -373,10 +390,6 @@ $current_page = 'community';
                             <div class="form-group">
                                 <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="editContent" name="content" required>${data.content}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="editMembers"><i class="fas fa-users"></i> Members Count</label>
-                                <input type="number" id="editMembers" name="members" value="${data.members}" required min="0">
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Featured Image</label>

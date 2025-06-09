@@ -30,11 +30,10 @@ if (isset($_GET['edit'])) {
 
 // Handle Create or Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Only proceed if name and role are set
-    if (isset($_POST['name']) && isset($_POST['role'])) {
-        $name = trim($_POST['name']);
-        $role = trim($_POST['role']);
-        $bio = trim($_POST['bio'] ?? '');
+    // Only proceed if title and content are set
+    if (isset($_POST['title']) && isset($_POST['content'])) {
+        $title = trim($_POST['title']);
+        $content = trim($_POST['content']);
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -59,57 +58,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
             
             // Get the current image name before making any changes
-            $stmt = $conn->prepare('SELECT image FROM developers WHERE id=?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $current_image = null;
-            if ($row = $result->fetch_assoc()) {
-                $current_image = $row['image'];
-            }
-            $stmt->close();
-            
-            // Prepare the update based on image state
-            if ($remove_image) {
-                // Remove image case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+            $stmt = $conn->prepare('SELECT image FROM developers WHERE id = ?');
+            if ($stmt) {
+                $stmt->bind_param('i', $id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $current_image = null;
+                if ($row = $result->fetch_assoc()) {
+                    $current_image = $row['image'];
                 }
-                $stmt = $conn->prepare('UPDATE developers SET name=?, role=?, bio=?, image=NULL WHERE id=?');
-                $stmt->bind_param('sssi', $name, $role, $bio, $id);
-            } else if ($image) {
-                // New image uploaded case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+                $stmt->close();
+                
+                // Prepare the update based on image state
+                if ($remove_image) {
+                    // Remove image case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, image = NULL WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else if ($image) {
+                    // New image uploaded case
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, image = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('sssi', $title, $content, $image, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                } else {
+                    // No image change case
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('ssi', $title, $content, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
                 }
-                $stmt = $conn->prepare('UPDATE developers SET name=?, role=?, bio=?, image=? WHERE id=?');
-                $stmt->bind_param('ssssi', $name, $role, $bio, $image, $id);
-            } else {
-                // No image change case
-                $stmt = $conn->prepare('UPDATE developers SET name=?, role=?, bio=? WHERE id=?');
-                $stmt->bind_param('sssi', $name, $role, $bio, $id);
             }
-            
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
-                exit();
-            } else {
-                $message = 'Update failed: ' . $stmt->error;
-            }
-            $stmt->close();
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO developers (name, role, bio, image) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssss', $name, $role, $bio, $image);
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
-                exit();
+            $stmt = $conn->prepare('INSERT INTO developers (title, content, image) VALUES (?, ?, ?)');
+            if ($stmt) {
+                $stmt->bind_param('sss', $title, $content, $image);
+                if ($stmt->execute()) {
+                    header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
+                    exit();
+                } else {
+                    $message = 'Error: ' . $stmt->error;
+                }
+                $stmt->close();
             } else {
-                $message = 'Error: ' . $stmt->error;
+                $message = 'Error preparing statement: ' . $conn->error;
             }
-            $stmt->close();
         }
     }
 }
@@ -174,16 +196,16 @@ $current_page = 'developers';
                 <?php while ($row = $entries->fetch_assoc()): ?>
                     <div class="post-row" data-post-id="<?= $row['id'] ?>">
                         <?php if ($row['image']): ?>
-                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
+                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['title']) ?>">
                         <?php else: ?>
                             <div class="no-image">
                                 <i class="fas fa-user"></i>
                             </div>
                         <?php endif; ?>
-                        <span class="post-title"><?= htmlspecialchars($row['name']) ?></span>
-                        <span class="post-role"><?= htmlspecialchars($row['role']) ?></span>
+                        <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
+                        <span class="post-role"><?= htmlspecialchars($row['content']) ?></span>
                         <?php
-                        $bio = strip_tags($row['bio']);
+                        $bio = strip_tags($row['github_link']);
                         $truncated = mb_substr($bio, 0, 105);
                         if (mb_strlen($bio) > 105) {
                             $truncated .= '...';
@@ -191,10 +213,10 @@ $current_page = 'developers';
                         ?>
                         <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-name="<?= htmlspecialchars($row['name']) ?>" data-role="<?= htmlspecialchars($row['role']) ?>" data-bio="<?= htmlspecialchars($row['bio']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-github_link="<?= htmlspecialchars($row['github_link']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="delete-btn" data-id="<?= $row['id'] ?>" data-name="<?= htmlspecialchars($row['name']) ?>">
+                            <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
                         </div>
@@ -277,9 +299,9 @@ $current_page = 'developers';
                 const btn = e.target.closest('.edit-btn');
                 const postData = {
                     id: btn.getAttribute('data-id'),
-                    name: btn.getAttribute('data-name'),
-                    role: btn.getAttribute('data-role'),
-                    bio: btn.getAttribute('data-bio'),
+                    title: btn.getAttribute('data-title'),
+                    content: btn.getAttribute('data-content'),
+                    github_link: btn.getAttribute('data-github_link'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -292,7 +314,7 @@ $current_page = 'developers';
                 const btn = e.target.closest('.delete-btn');
                 const postData = {
                     id: btn.getAttribute('data-id'),
-                    name: btn.getAttribute('data-name')
+                    title: btn.getAttribute('data-title')
                 };
                 openModal('delete', postData);
                 return;
@@ -332,16 +354,12 @@ $current_page = 'developers';
                         <h2><i class="fas fa-plus-circle"></i> Add New Developer</h2>
                         <form id="createPostForm" method="POST" enctype="multipart/form-data">
                             <div class="form-group">
-                                <label for="createName"><i class="fas fa-user"></i> Name</label>
-                                <input type="text" id="createName" name="name" placeholder="Enter developer name" required>
+                                <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
+                                <input type="text" id="createTitle" name="title" placeholder="Enter developer name" required>
                             </div>
                             <div class="form-group">
-                                <label for="createRole"><i class="fas fa-briefcase"></i> Role</label>
-                                <input type="text" id="createRole" name="role" placeholder="Enter developer role" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="createBio"><i class="fas fa-align-left"></i> Bio</label>
-                                <textarea id="createBio" name="bio" placeholder="Write developer bio here..."></textarea>
+                                <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
+                                <textarea id="createContent" name="content" placeholder="Write developer role/position here..." required></textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
@@ -368,16 +386,12 @@ $current_page = 'developers';
                             <input type="hidden" name="id" value="${data.id}">
                             <input type="hidden" name="remove_image" value="false" id="removeImageFlag">
                             <div class="form-group">
-                                <label for="editName"><i class="fas fa-user"></i> Name</label>
-                                <input type="text" id="editName" name="name" value="${data.name}" required>
+                                <label for="editTitle"><i class="fas fa-heading"></i> Title</label>
+                                <input type="text" id="editTitle" name="title" value="${data.title}" required>
                             </div>
                             <div class="form-group">
-                                <label for="editRole"><i class="fas fa-briefcase"></i> Role</label>
-                                <input type="text" id="editRole" name="role" value="${data.role}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editBio"><i class="fas fa-align-left"></i> Bio</label>
-                                <textarea id="editBio" name="bio">${data.bio}</textarea>
+                                <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
+                                <textarea id="editContent" name="content" required>${data.content}</textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
@@ -416,7 +430,7 @@ $current_page = 'developers';
                         <h2><i class="fas fa-trash-alt"></i> Delete Developer</h2>
                         <div class="delete-confirmation">
                             <i class="fas fa-exclamation-triangle headTrash"></i>
-                            <p>Are you sure you want to delete "<strong>${data.name}</strong>"?</p>
+                            <p>Are you sure you want to delete "<strong>${data.title}</strong>"?</p>
                             <p>This action cannot be undone.</p>
                             <div class="delete-actions">
                                 <button type="button" class="deleting-btn" onclick="confirmDelete(${data.id})">
