@@ -90,7 +90,7 @@ body {
 .stat-card:hover {
     transform: translateY(-5px);
 }
-
+ 
 .stat-card i {
     font-size: 2rem;
     margin-bottom: 1rem;
