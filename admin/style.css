@@ -347,6 +347,17 @@ h1 {
     resize: vertical;
 }
 
+.form-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 1rem;
+}
+
+.form-col {
+    flex: 1;
+}
+
 .custom-file {
     margin-bottom: 20px;
 }
@@ -801,6 +812,17 @@ table, th, td {
     opacity: 0.9;
 }
 
+.post-info {
+    display: flex;
+    flex: 1;
+    gap: 1rem;
+}
+
+.post-meta {
+    display: flex;
+    gap: 0.2rem;
+}
+
 .post-actions {
     display: flex;
     justify-content: center;
@@ -1154,5 +1176,67 @@ table, th, td {
 
 .img-preview-container img:hover {
     filter: brightness(1.1);
+}
+
+/* Modern Popup Message Styles */
+.popup-message {
+    position: fixed;
+    top: -100px; /* Start above the viewport */
+    left: 91%;
+    transform: translateX(-50%);
+    background: #181c20;
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 0.8rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 1px solid rgba(78, 230, 242, 0.2);
+    min-width: 300px;
+    max-width: 90%;
+}
+
+.popup-message.show {
+    top: 20px;
+    opacity: 1;
+}
+
+.popup-message i {
+    font-size: 1.2rem;
+}
+
+/* Success message style */
+.popup-message.success {
+    background: rgba(40, 167, 69, 0.95);
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.popup-message.success i {
+    color: #fff;
+}
+
+/* Error message style */
+.popup-message.error {
+    background: rgba(220, 53, 69, 0.95);
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+.popup-message.error i {
+    color: #fff;
+}
+
+/* Warning message style */
+.popup-message.warning {
+    background: rgba(255, 193, 7, 0.95);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #000;
+}
+
+.popup-message.warning i {
+    color: #000;
 }
 

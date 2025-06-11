@@ -34,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['title']) && isset($_POST['content'])) {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
+        $section = trim($_POST['section'] ?? '');
+        $year = intval($_POST['year'] ?? 0);
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -75,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, image = NULL WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, section = ?, year = ?, image = NULL WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssi', $title, $content, $id);
+                        $stmt->bind_param('sssii', $title, $content, $section, $year, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -91,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, image = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, section = ?, year = ?, image = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssi', $title, $content, $image, $id);
+                        $stmt->bind_param('sssisi', $title, $content, $section, $year, $image, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -104,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // No image change case
-                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, section = ?, year = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssi', $title, $content, $id);
+                        $stmt->bind_param('sssii', $title, $content, $section, $year, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -119,9 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO community (title, content, image) VALUES (?, ?, ?)');
+            $stmt = $conn->prepare('INSERT INTO community (title, content, section, year, image) VALUES (?, ?, ?, ?, ?)');
             if ($stmt) {
-                $stmt->bind_param('sss', $title, $content, $image);
+                $stmt->bind_param('sssis', $title, $content, $section, $year, $image);
                 if ($stmt->execute()) {
                     header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
                     exit();
@@ -142,14 +144,20 @@ if (isset($_GET['msg'])) {
         case 'added':
             $message = 'Community entry added successfully!';
             $action_type = 'create';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
         case 'updated':
             $message = 'Community entry updated successfully!';
             $action_type = 'update';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
         case 'deleted':
             $message = 'Community entry deleted successfully!';
             $action_type = 'delete';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
     }
     
@@ -159,6 +167,15 @@ if (isset($_GET['msg'])) {
             window.history.replaceState(null, null, window.location.pathname);
         }
     </script>";
+}
+
+// Handle error messages
+if (strpos($message, 'Error') === 0 || strpos($message, 'failed') !== false) {
+    $message_type = 'error';
+    $message_icon = 'fa-exclamation-circle';
+} elseif (!isset($message_type)) {
+    $message_type = 'warning';
+    $message_icon = 'fa-exclamation-triangle';
 }
 
 // Fetch all entries
@@ -179,9 +196,9 @@ $current_page = 'community';
 <body>
     <?php include 'includes/sidebar.php'; ?>
     <div class="main-content">
-        <div id="popupMessage" class="popup-message<?= $message ? ' show' : '' ?>">
+        <div id="popupMessage" class="popup-message<?= $message ? ' show ' . ($message_type ?? '') : '' ?>">
             <?php if ($message): ?>
-                <i class="fas fa-check-circle"></i>
+                <i class="fas <?= $message_icon ?? 'fa-info-circle' ?>"></i>
                 <?= $message ?>
             <?php endif; ?>
         </div>
@@ -202,17 +219,25 @@ $current_page = 'community';
                                 <i class="fas fa-image"></i>
                             </div>
                         <?php endif; ?>
-                        <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
-                        <?php
-                        $content = strip_tags($row['content']);
-                        $truncated = mb_substr($content, 0, 105);
-                        if (mb_strlen($content) > 105) {
-                            $truncated .= '...';
-                        }
-                        ?>
-                        <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
+                        <span class="post-title"><?= htmlspecialchars($row['title']) ?><div class="post-meta">
+                            <span class="post-year"><?= $row['year'] ?></span>
+                            <span>-</span>
+                            <span class="post-section"><?= htmlspecialchars($row['section']) ?></span>
+                            </div></span>
+                        <div class="post-info">
+                            
+                            
+                            <?php
+                            $content = strip_tags($row['content']);
+                            $truncated = mb_substr($content, 0, 105);
+                            if (mb_strlen($content) > 105) {
+                                $truncated .= '...';
+                            }
+                            ?>
+                            <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
+                        </div>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-section="<?= htmlspecialchars($row['section']) ?>" data-year="<?= $row['year'] ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -300,6 +325,8 @@ $current_page = 'community';
                     id: btn.getAttribute('data-id'),
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
+                    section: btn.getAttribute('data-section'),
+                    year: btn.getAttribute('data-year'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -355,6 +382,17 @@ $current_page = 'community';
                                 <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
                                 <input type="text" id="createTitle" name="title" placeholder="Enter community title" required>
                             </div>
+                            <div class="form-row">
+                                <div class="form-group form-col">
+                                    <label for="createYear"><i class="fas fa-calendar"></i> Year</label>
+                                    <input type="number" id="createYear" name="year" placeholder="Enter year" min="1" max="4" required>
+                                </div>
+                                <div class="form-group form-col">
+                                    <label for="createSection"><i class="fas fa-tag"></i> Section</label>
+                                    <input type="text" id="createSection" name="section" placeholder="Enter section" required>
+                                </div>
+
+                            </div>
                             <div class="form-group">
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="createContent" name="content" placeholder="Write community content here..." required></textarea>
@@ -386,6 +424,16 @@ $current_page = 'community';
                             <div class="form-group">
                                 <label for="editTitle"><i class="fas fa-heading"></i> Title</label>
                                 <input type="text" id="editTitle" name="title" value="${data.title}" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group form-col">
+                                    <label for="editYear"><i class="fas fa-calendar"></i> Year</label>
+                                    <input type="number" id="editYear" name="year" value="${data.year}" min="1" max="4" required>
+                                </div>
+                                <div class="form-group form-col">
+                                    <label for="editSection"><i class="fas fa-tag"></i> Section</label>
+                                    <input type="text" id="editSection" name="section" value="${data.section}" required>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
@@ -712,4 +760,4 @@ $current_page = 'community';
     })(); // End IIFE
     </script>
 </body>
-</html> 
+</html>

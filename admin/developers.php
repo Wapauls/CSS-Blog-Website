@@ -142,14 +142,20 @@ if (isset($_GET['msg'])) {
         case 'added':
             $message = 'Developer added successfully!';
             $action_type = 'create';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
         case 'updated':
             $message = 'Developer updated successfully!';
             $action_type = 'update';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
         case 'deleted':
             $message = 'Developer deleted successfully!';
             $action_type = 'delete';
+            $message_type = 'success';
+            $message_icon = 'fa-check-circle';
             break;
     }
     
@@ -159,6 +165,15 @@ if (isset($_GET['msg'])) {
             window.history.replaceState(null, null, window.location.pathname);
         }
     </script>";
+}
+
+// Handle error messages
+if (strpos($message, 'Error') === 0 || strpos($message, 'failed') !== false) {
+    $message_type = 'error';
+    $message_icon = 'fa-exclamation-circle';
+} elseif (!isset($message_type)) {
+    $message_type = 'warning';
+    $message_icon = 'fa-exclamation-triangle';
 }
 
 // Fetch all entries
@@ -179,9 +194,9 @@ $current_page = 'developers';
 <body>
     <?php include 'includes/sidebar.php'; ?>
     <div class="main-content">
-        <div id="popupMessage" class="popup-message<?= $message ? ' show' : '' ?>">
+        <div id="popupMessage" class="popup-message<?= $message ? ' show ' . ($message_type ?? '') : '' ?>">
             <?php if ($message): ?>
-                <i class="fas fa-check-circle"></i>
+                <i class="fas <?= $message_icon ?? 'fa-info-circle' ?>"></i>
                 <?= $message ?>
             <?php endif; ?>
         </div>
@@ -211,7 +226,7 @@ $current_page = 'developers';
                             $truncated .= '...';
                         }
                         ?>
-                        <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
+                        
                         <div class="post-actions">
                             <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-github_link="<?= htmlspecialchars($row['github_link']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
