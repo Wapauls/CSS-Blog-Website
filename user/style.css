@@ -12,7 +12,9 @@ body {
     line-height: 1.6;
 }
 
-
+.placeholder {
+    text-align: center;
+}
 
 /* Base Navigation Styles (Enhanced) */
 .navbar {
