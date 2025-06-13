@@ -208,6 +208,8 @@ switch($current_page) {
     
     </div>
 
+    <div class="placeholder"> </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
