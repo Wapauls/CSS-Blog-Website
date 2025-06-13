@@ -34,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['title']) && isset($_POST['content'])) {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
+        $roles = trim($_POST['roles'] ?? '');
+        $skills = trim($_POST['skills'] ?? '');
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -75,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, image = NULL WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ?, image = NULL WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssi', $title, $content, $id);
+                        $stmt->bind_param('ssssi', $title, $content, $roles, $skills, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -91,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, image = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ?, image = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssi', $title, $content, $image, $id);
+                        $stmt->bind_param('sssssi', $title, $content, $roles, $skills, $image, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -104,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // No image change case
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssi', $title, $content, $id);
+                        $stmt->bind_param('ssssi', $title, $content, $roles, $skills, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -119,9 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO developers (title, content, image) VALUES (?, ?, ?)');
+            $stmt = $conn->prepare('INSERT INTO developers (title, content, roles, skills, image) VALUES (?, ?, ?, ?, ?)');
             if ($stmt) {
-                $stmt->bind_param('sss', $title, $content, $image);
+                $stmt->bind_param('sssss', $title, $content, $roles, $skills, $image);
                 if ($stmt->execute()) {
                     header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
                     exit();
@@ -219,16 +221,30 @@ $current_page = 'developers';
                         <?php endif; ?>
                         <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
                         <span class="post-role"><?= htmlspecialchars($row['content']) ?></span>
-                        <?php
-                        $bio = strip_tags($row['github_link']);
-                        $truncated = mb_substr($bio, 0, 105);
-                        if (mb_strlen($bio) > 105) {
-                            $truncated .= '...';
-                        }
-                        ?>
-                        
+                        <div class="role-and-skill-container">
+                            <div class="roles">
+                                <?php
+                                $roles = explode("\n", $row['roles']);
+                                foreach ($roles as $role) {
+                                    if (trim($role) !== '') {
+                                        echo '<span class="role-tag">' . htmlspecialchars(trim($role)) . '</span>';
+                                    }
+                                }
+                                ?>
+                            </div>
+                            <div class="skills">
+                                <?php
+                                $skills = explode("\n", $row['skills']);
+                                foreach ($skills as $skill) {
+                                    if (trim($skill) !== '') {
+                                        echo '<span class="skill-tag">' . htmlspecialchars(trim($skill)) . '</span>';
+                                    }
+                                }
+                                ?>
+                            </div>
+                        </div>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-github_link="<?= htmlspecialchars($row['github_link']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-roles="<?= htmlspecialchars($row['roles']) ?>" data-skills="<?= htmlspecialchars($row['skills']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -316,7 +332,8 @@ $current_page = 'developers';
                     id: btn.getAttribute('data-id'),
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
-                    github_link: btn.getAttribute('data-github_link'),
+                    roles: btn.getAttribute('data-roles'),
+                    skills: btn.getAttribute('data-skills'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -376,6 +393,14 @@ $current_page = 'developers';
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="createContent" name="content" placeholder="Write developer role/position here..." required></textarea>
                             </div>
+                            <div class="form-group">
+                                <label for="createRoles"><i class="fas fa-user-tag"></i> Roles</label>
+                                <textarea id="createRoles" name="roles" placeholder="Enter developer roles (one per line)..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="createSkills"><i class="fas fa-code"></i> Skills</label>
+                                <textarea id="createSkills" name="skills" placeholder="Enter developer skills (one per line)..." required></textarea>
+                            </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
                                 <label class="file-input-label" for="createImage">
@@ -407,6 +432,14 @@ $current_page = 'developers';
                             <div class="form-group">
                                 <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="editContent" name="content" required>${data.content}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editRoles"><i class="fas fa-user-tag"></i> Roles</label>
+                                <textarea id="editRoles" name="roles" required>${data.roles}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editSkills"><i class="fas fa-code"></i> Skills</label>
+                                <textarea id="editSkills" name="skills" required>${data.skills}</textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>

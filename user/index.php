@@ -147,31 +147,63 @@ switch($current_page) {
                 <?php endif; ?>
             </div>
 
-        <?php elseif ($current_page === 'developers'): ?>
-            <h1>Our Developers</h1>
-            <div class="developers-section">
-                <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
-                    <?php while ($row = $dev_entries->fetch_assoc()): ?>
-                        <div class="developer-entry">
-                            <h2><?= htmlspecialchars($row['title']) ?></h2>
-                            <?php if ($row['image']): ?>
-                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
-                            <?php endif; ?>
-                            <div class="content">
-                                <?= nl2br(htmlspecialchars($row['content'])) ?>
+            <?php elseif ($current_page === 'developers'): ?>
+    <h1 class="developer-title">Meet Our Developers</h1>
+    <div class="developers-section">
+        <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
+            <?php while ($row = $dev_entries->fetch_assoc()): ?>
+                <div class="developer-card">
+                    <div class="developer-name-pretext"><?= htmlspecialchars($row['title']) ?></div>
+                    <?php if ($row['image']): ?>
+                        <img class="developer-image-card" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['title']) ?>" loading="lazy">
+                    <?php else: ?>
+                        <img class="developer-image-card" src="../assets/images/default-avatar.jpg" alt="<?= htmlspecialchars($row['title']) ?>" loading="lazy">
+                    <?php endif; ?>
+                    <div class="developer-container">
+                        <?php if ($row['image']): ?>
+                            <img class="developer-profile-image" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="Developer Profile" />
+                        <?php else: ?>
+                            <img class="developer-profile-image" src="../assets/images/default-avatar.jpg" alt="Developer Profile" />
+                        <?php endif; ?>
+
+                        <div class="developer-top">
+                            <span><strong><?= htmlspecialchars($row['title']) ?></strong></span>
+                            <span class="developer-role"><?= htmlspecialchars($row['roles']) ?></span>
+                    </div>
+                    
+                        <div class="developer-middle">
+                            <p class="content"><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                             </div>
-                            <?php if ($row['github_link']): ?>
-                                <a href="<?= htmlspecialchars($row['github_link']) ?>" target="_blank" class="github-link">
-                                    <i class="fab fa-github"></i> View GitHub Profile
-                                </a>
+
+                        <div class="developer-bottom">
+                        <?php if ($row['skills']): ?>
+                                <?php 
+                                $skills = explode("\n", $row['skills']);
+                                foreach ($skills as $skill): 
+                                    $skill = trim($skill);
+                                    if ($skill):
+                                ?>
+                                    <span class="skill"><?= htmlspecialchars($skill) ?></span>
+                                <?php 
+                                    endif;
+                                endforeach; 
+                                ?>
                             <?php endif; ?>
-                        </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p class="no-content">Developer profiles coming soon.</p>
-                <?php endif; ?>
+                            </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <div class="no-content">
+                <h3>Developer Profiles Coming Soon</h3>
+                <p>We're working on showcasing our amazing development team. Check back soon!</p>
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Include the lighting effects JavaScript -->
+    <script src="js/developers-lighting.js" defer></script>
+    <?php endif; ?>
     </div>
 </body>
 </html> 
