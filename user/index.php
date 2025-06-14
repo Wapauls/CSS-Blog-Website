@@ -205,6 +205,19 @@ switch($current_page) {
         </div>
     </div>
 
+    <!-- From Uiverse.io by Nawsome --> 
+<div class="banter-loader">
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+  <div class="banter-loader__box"></div>
+</div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
