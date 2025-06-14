@@ -204,25 +204,33 @@ switch($current_page) {
 <!-- Community Section -->
 
     <?php elseif ($current_page === 'community'): ?>
+        <div class="community-title">
+            <h1 class="community-header"> Our <span class="highlight"> Community </span> </div>
+
     <div class="community-container">
         <h1 class="Community"> NextGen <span class="highlight-community">CSS</span></h1>
 
         <div class="campaign-container">
-            <img src="../uploads/css-campaign.png" alt="Campaign" class="Campaign-image">
+            <img src="/user/uploads/css-campaign.png" alt="Campaign" class="campaign-image">
                 <p class="Community-description">We, the Computer Science Society (CSS) community, are committed to building a progressive and inclusive society.<br><br>
                     Rooted in innovation and driven by purpose, we aim to empower Clarean students to lead with integrity, collaborate with intention, and thrive in the evolving world of Information and Computing Sciences.<br><br>
                         Through the Progressive CSS Campaign, we foster a culture of excellence, growth, and shared knowledge.<br><br>
                             We envision a future where every member is equipped, inspired, and united in shaping meaningful change through technology.<br></p>
         </div>
 
-        <div class="cs-society-section">
-    <div class="cs-society-text">
-        <h1 class="cs-society-title">Clarean CS Society:</h1>
-            <h2 class="cs-society-subtitle">Code. Connect. Create.</h2>
-                <p class="cs-society-description">The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation.</p>
-        <p class="cs-society-description">We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world.</p>
+    <div class="cs-society-section">
+        <div class="cs-society-text">
+            <div class="cs-society-header">   
+                <h1 class="cs-society-title">Clarean CS Society:</h1>
+                    <h2 class="cs-society-subtitle">Code. Connect. Create.</h2>
+        </div>
+
+        <div class="cs-society-content">
+            <img src="../user/uploads/hartsdeh.jpg" alt="CS Society" class="cs-image">         
+                <p class="cs-society-description">The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation. <br> <br>
+                    We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world. </p>
+        </div>
     </div>
-    <img src="../uploads/hartsdeh.jpg" alt="CS Society" class="CS-Society">
 </div>
 
 
@@ -312,25 +320,25 @@ switch($current_page) {
         <div class="board-executive-container">
         <div class="faculty-grid"> <!--First Row-->
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Kyle Vincent Z. Pasuquin" class="faculty-image">
+                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\Pres.Kyle.jpg" alt="Kyle-jpg" class="yaKyle">
                     <h3 class="faculty-name">Kyle Vincent Z. Pasuquin</h3>
                     <p class="faculty-position">Departmental President</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Jake Russel Belen" class="faculty-image">
+                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\VP internal.Jake.jpg" alt="Russel-jpg" class="faculty-image">
                     <h3 class="faculty-name">Jake Russel Belen</h3>
                     <p class="faculty-position">Vice-President Internal</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Raine E.Esparrago" class="faculty-image">
+                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\VP ecternal.raine.jpg" alt="Raine-jpg" class="faculty-image">
                     <h3 class="faculty-name">Raine E.Esparrago</h3>
                     <p class="faculty-position">Vice-President External</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Clariss Mae D. Selisana" class="faculty-image">
+                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\secretary.clarisse.jpg" alt="Clariss-jpg" class="faculty-image">
                     <h3 class="faculty-name">Clariss Mae D. Selisana</h3>
                     <p class="faculty-position">Departmental Secretary</p>
                 </div>

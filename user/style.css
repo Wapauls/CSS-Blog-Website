@@ -12,7 +12,9 @@ body {
     line-height: 1.6;
 }
 
-
+.placeholder {
+    text-align: center;
+}
 
 /* Base Navigation Styles (Enhanced) */
 .navbar {
@@ -46,25 +48,68 @@ body {
 
 .logo {
     display: flex;
-    align-items: center;
-    margin-left: -150px;
-    transition: transform 0.3s ease;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.dept-logo {
+    height: 120px;
+    width: auto;
+    max-width: 220px;
+    transition: height 0.3s;
+}
+
+@media (max-width: 1200px) {
+    .dept-logo, .logo img {
+        height: 100px;
+        width: auto;
+        max-width: 160px;
+    }
+}
+@media (max-width: 992px) {
+    .dept-logo, .logo img {
+        height: 80px;
+        max-width: 120px;
+    }
+}
+@media (max-width: 768px) {
+    .dept-logo, .logo img {
+        height: 60px;
+        max-width: 90px;
+    }
+}
+@media (max-width: 480px) {
+    .dept-logo, .logo img {
+        height: 40px;
+        max-width: 60px;
+    }
+}
+@media (max-width: 350px) {
+    .dept-logo, .logo img {
+        height: 30px;
+        max-width: 40px;
+    }
 }
 
 .navbar.scrolled .logo {
-    transform: scale(0.8);
-    margin-left: -100px;
-}
-
-.logo img {
-    height: 150px;
-    width: auto;
-    transition: all 0.3s ease;
-    filter: brightness(1.1);
+    transform: none;
+    margin-left: 0;
 }
 
 .navbar.scrolled .logo img {
     height: 80px;
+}
+
+.logo img {
+    max-height: 50rem;
+    max-width: 250rem;
+    width: auto;
+    height: auto;
+    transition: all 0.3s ease;
+    filter: brightness(1.1);
 }
 
 /* Desktop Navigation Links - Enhanced */
@@ -255,13 +300,28 @@ body {
     .nav-container {
         padding: 0 1rem;
     }
-
-    .logo img {
-        height: 60px;
+    
+    .hero {
+        padding: 0 1rem;
     }
-
-    .navbar.scrolled .logo img {
-        height: 50px;
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .feature-pills {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .feature-pill-same,
+    .feature-pill.outline {
+        font-size: 18px;
+    }
+    
+    .hashtag {
+        font-size: 35px;
+        margin-top: 30px;
     }
 }
 
@@ -397,7 +457,7 @@ body {
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    height: 400px;
+    height: 200px;
     width: auto;
     object-fit: contain;
     opacity: 0.9;
@@ -498,14 +558,14 @@ body {
     font-size: 4rem;
     color: #3EF4E2;
     margin-bottom: 3rem;
-    margin-right: 10rem;
+    margin-right: 15rem;
     text-align: right;
     display: flex;
     gap: 1rem;
 
 }
 
-.highlight {
+.highlight-community {
     color: #ffffff;
 }
 
@@ -514,20 +574,25 @@ body {
     display: flex;
     align-items: center;
     gap: 3rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 5rem;
 }
 
-.Campaign-image {
+.campaign-image {
     flex-shrink: 0;
-    max-width: 300px;
+    max-width: 100%;
+    width: 40%;
     height: 100%;
     margin-bottom: 5rem;
+    margin-top: 5rem;
+    margin-left: 5rem;
+    border-radius: 10px;
     
 }
 
 .Community-description {
     flex: 1;
-    font-size: 1rem;
+    font-size: 1.5rem;
     line-height: 1.6;
     color: #fff;
     text-align: justify;
@@ -557,31 +622,54 @@ body {
     margin: 1rem 0;
 }
 
-.society-introduction {
-    width: 100%;
-    height: 100%;
-    font-size: 3rem;
-    margin-left: 5rem;
-    margin-top: 50px;
+
+.cs-society-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 50px auto 75px auto;
 }
 
-.highlight {
+.cs-society-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-top: 100px;
+    margin-bottom: 30px;
+    margin-left: 5rem;
+}
+.cs-society-subtitle {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-left: 5rem;
     color: #3EF4E2;
 }
-
-.society-description {
-    margin-right: 50rem;
-}
-.soc-description {
-    width: 100%;
-    height: 100%;
+.cs-society-description {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    color: #ffffff;
     text-align: justify;
-    display: flex;
+    flex: 1;
+    max-width: 50%;
+    margin: 0;
+    padding-right: 2rem;
+    align-self: center;
+    margin-top: -22rem;
     margin-left: 5rem;
+}
 
+.cs-image {
+    flex-shrink: 0;
+    max-width: 700px;
+    width: 40%;
+    margin-left: auto; /* This pushes the image to the right */
+    margin-top: 0; /* Remove the large top margin */
+    margin-right: 2rem; /* Adjust spacing from right edge */
+    border-radius: 10px;
 }
 
 .department-head-title {
+    font-size: 2.5rem;
     margin-top: 50px;
 }
 
@@ -601,12 +689,86 @@ body {
         .highlight {
             color: #3EF4E2;
         }
-
+/*Board Faculty Description*/
         .board-faculty-description {
-            font-size: 1rem;
+            font-size: 1.5rem;
             line-height: 1.6;
             margin: 50px auto 100px auto;
-            max-width: 900px;
+            max-width: 200rem;
+            color: #ffffff;
+        }
+
+/*Board Executive Section*/
+        .board-executive-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .board-executive-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 100px;
+            margin-bottom: 30px;
+        }
+
+        .board-executive-description {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin: 50px auto 100px auto;
+            max-width: 200rem;
+            color: #ffffff;
+        }
+
+        .executive-faculty-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+/*Core Executive Section*/
+        .core-executive-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .core-executive-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 100px;
+            margin-bottom: 30px;
+        }
+        
+        .core-executive-description {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin: 50px auto 100px auto;
+            max-width: 200rem;
+            color: #ffffff;
+        }
+
+/*Board Year-level Representatives Section*/
+        .board-year-level-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .board-year-level-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 100px;
+            margin-bottom: 30px;
+        }
+        
+        .board-year-level-description {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin: 50px auto 100px auto;
+            max-width: 200rem;
+            color: #ffffff;
         }
 
 /*Board Faculty Grid Layout*/
@@ -676,10 +838,10 @@ body {
 
 /* Description Styling */
 .board-faculty-description {
-    font-size: 1rem;
+    font-size: 1.5rem;
     line-height: 1.6;
-    margin: 30px auto 50px auto;
-    max-width: 900px;
+    margin: 50px auto 100px auto;
+    max-width: 200rem;
     color: #ffffff;
 }
 
@@ -744,6 +906,18 @@ body {
     color: #cccccc;
 }
 
+
+
+
+/* Community Assets*/
+
+.yaKyle {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
 /* News Section */
 .news-section {
     display: grid;
@@ -1433,8 +1607,8 @@ body {
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #0a0a0a;
+    font-family: 'Poppins';
+    background-color: #000000;
     color: #ffffff;
     line-height: 1.6;
 }
@@ -1466,8 +1640,8 @@ body {
 }
 
 .logo img {
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
 }
 
 .logo-text {
@@ -1651,6 +1825,7 @@ body {
 }
 
 .department-head-description {
+    font-size: 1.5rem;
     text-align: center;
     margin-left: 10rem;
     margin-right: 10rem;
@@ -2277,4 +2452,87 @@ body {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Global responsive image rule */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive breakpoints for all major devices */
+@media (max-width: 1200px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 90vw;
+    height: auto;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    width: 100%;
+    max-width: 95vw;
+    padding: 1.5rem;
+  }
+}
+@media (max-width: 1024px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 85vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 92vw;
+    padding: 1.2rem;
+  }
+}
+@media (max-width: 900px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 80vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 98vw;
+    padding: 1rem;
+  }
+}
+@media (max-width: 768px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 75vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 99vw;
+    padding: 0.8rem;
+  }
+}
+@media (max-width: 600px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 98vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 100vw;
+    padding: 0.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 99vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 100vw;
+    padding: 0.3rem;
+  }
+}
+@media (max-width: 375px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 99vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 100vw;
+    padding: 0.2rem;
+  }
+}
+@media (max-width: 320px) {
+  .dept-logo, .logo img, .post img, .about-entry img, .developer-entry img, .feature-icon img, .institution-logo, .partner-logo img, .CS-Society, .adviser-image, .faculty-image {
+    max-width: 100vw;
+  }
+  .feature-card, .post, .about-entry, .developer-entry {
+    max-width: 100vw;
+    padding: 0.1rem;
+  }
 }
