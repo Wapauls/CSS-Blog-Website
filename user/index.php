@@ -36,7 +36,7 @@ switch($current_page) {
     <nav class="navbar">
     <div class="nav-container">
         <div class="logo">
-            <img src="../uploads/logo.png" alt="Department Logo" class="dept-logo">
+            <img src="../user/uploads/logo.png" alt="Department Logo" class="dept-logo">
         </div>
 
         <div class="nav-links">
@@ -85,7 +85,7 @@ switch($current_page) {
                         <div class="feature-pill-same"><span class="highlight-letter">S</span>hine</div>
                     </div>
                 </div>
-                <img src="../uploads/bscslogo.png" alt="Logo" class="hero-department-logo">
+                <img src="../user/uploads/bscslogo.png" alt="Logo" class="hero-department-logo">
             </div>
         </section>
 
@@ -96,7 +96,7 @@ switch($current_page) {
                     <div class="feature-cards">
                         <div class="feature-card">
                             <div class="feature-icon">
-                                <img src="../uploads/code.png" alt="Code Icon">
+                                <img src="../user/uploads/code.png" alt="Code Icon">
                             </div>
                             <div class="feature-text">
                                 <h3>Code</h3>
@@ -105,7 +105,7 @@ switch($current_page) {
                         </div>
                         <div class="feature-card dark">
                             <div class="feature-icon">
-                                <img src="../uploads/style.png" alt="Style Icon">
+                                <img src="../user/uploads/style.png" alt="Style Icon">
                             </div>
                             <div class="feature-text">
                                 <h3>Style</h3>
@@ -114,7 +114,7 @@ switch($current_page) {
                         </div>
                         <div class="feature-card">
                             <div class="feature-icon">
-                                <img src="../uploads/shine.png" alt="Shine Icon">
+                                <img src="../user/uploads/shine.png" alt="Shine Icon">
                             </div>
                             <div class="feature-text">
                                 <h3>Shine</h3>
@@ -127,8 +127,8 @@ switch($current_page) {
                     <h1 class="institution-title">Our <span class="highlight">Institution</span></h1>
                     <p class="institution-description">The SCC Computer Science Society (SCC-CSS) operates as the official academic organization of the Computer Science Department under the guidance of the Center for Online Education System (COES) at St. Clare College. Anchored in the values of excellence and integrity, SCC-CSS is dedicated to promoting academic excellence and providing quality services to both internal and external stakeholders.</p>
                     <div class="logo-group">
-                        <img src="../uploads/scc.png" alt="SCC Logo" class="institution-logo">
-                        <img src="../uploads/sco.png" alt="SCO Logo" class="institution-logo">
+                        <img src="../user/uploads/scc.png" alt="SCC Logo" class="institution-logo">
+                        <img src="../user/uploads/sco.png" alt="SCO Logo" class="institution-logo">
                     </div>
                 </div>
             </div>
@@ -138,22 +138,22 @@ switch($current_page) {
             <h2>Our <span>Partners</span></h2>
             <div class="partners-container">
                 <div class="partner-logo">
-                    <img src="../uploads/sco.png" alt="SCO Online">
+                    <img src="../user/uploads/sco.png" alt="SCO Online">
                 </div>
                 <div class="partner-logo">
-                    <img src="../uploads/acer.png" alt="Acer">
+                    <img src="../user/uploads/acer.png" alt="Acer">
                 </div>
                 <div class="partner-logo">
-                    <img src="../uploads/edusuite.png" alt="Edusuite">
+                    <img src="../user/uploads/edusuite.png" alt="Edusuite">
                 </div>
                 <div class="partner-logo">
-                    <img src="../uploads/predator.png" alt="Predator">
+                    <img src="../user/uploads/predator.png" alt="Predator">
                 </div>
                 <div class="partner-logo">
-                    <img src="../uploads/knights.png" alt="Knights">
+                    <img src="../user/uploads/knights.png" alt="Knights">
                 </div>
                 <div class="partner-logo">
-                    <img src="../uploads/meta.png" alt="Meta">
+                    <img src="../user/uploads/meta.png" alt="Meta">
                 </div>
             </div>
         </section>
@@ -318,41 +318,43 @@ switch($current_page) {
     <p class="board-executive-description">
         The Executive Board comprises committed and experienced leaders who provide strategic direction to the society, driving its mission and fostering excellence in the field of information and Computing Sciences. </p>
         <div class="board-executive-container">
-        <div class="faculty-grid"> <!--First Row-->
-                <div class="faculty-member">
-                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\Pres.Kyle.jpg" alt="Kyle-jpg" class="yaKyle">
+        <div class="executive-faculty-grid"> <!--First Row-->
+                <div class="pres-Kyle">
+                    <img src="../user/uploads/Pres.Kyle.jpg" alt="Kyle-jpg" class="faculty-image">
                     <h3 class="faculty-name">Kyle Vincent Z. Pasuquin</h3>
                     <p class="faculty-position">Departmental President</p>
                 </div>
 
-                <div class="faculty-member">
-                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\VP internal.Jake.jpg" alt="Russel-jpg" class="faculty-image">
+                <div class="VP-internal">
+                    <img src="../user/uploads/VP internal.Jake.jpg" alt="Russel-jpg" class="faculty-image">
                     <h3 class="faculty-name">Jake Russel Belen</h3>
                     <p class="faculty-position">Vice-President Internal</p>
                 </div>
 
-                <div class="faculty-member">
-                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\VP ecternal.raine.jpg" alt="Raine-jpg" class="faculty-image">
+                <div class="VP-external">
+                    <img src="../user/uploads/VP ecternal.raine.jpg" alt="Raine-jpg" class="faculty-image">
                     <h3 class="faculty-name">Raine E.Esparrago</h3>
                     <p class="faculty-position">Vice-President External</p>
                 </div>
 
-                <div class="faculty-member">
-                    <img src="C:\xampp\htdocs\CSS-Blog-Website\CSS-Blog-Website\user\uploads\secretary.clarisse.jpg" alt="Clariss-jpg" class="faculty-image">
+            </div>
+
+            <div class="executive-grid"> <!--Second Row-->
+
+                <div class="dept-secretary">
+                    <img src="../user/uploads/secretary.clarisse.jpg" alt="Clariss-jpg" class="faculty-image">
                     <h3 class="faculty-name">Clariss Mae D. Selisana</h3>
                     <p class="faculty-position">Departmental Secretary</p>
                 </div>
-            </div>
 
-            <div class="executive-faculty-grid"> <!--Second Row-->
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Shenmar Bonifacio" class="faculty-image">
+                    <img src="../user/uploads/treasurer.shen.jpg" alt="Shenmar Bonifacio" class="faculty-image">
                     <h3 class="faculty-name">Shenmar Bonifacio</h3>
                     <p class="faculty-position">Departmental Treasurer</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Jahn Florence Balili" class="faculty-image">
+                    <img src="../user/uploads/audtior.balili.jpg" alt="Jahn Florence Balili" class="faculty-image">
                     <h3 class="faculty-name">Jahn Florence Balili</h3>
                     <p class="faculty-position">Departmental Auditor</p>
                 </div>
@@ -373,31 +375,31 @@ switch($current_page) {
 
     <div class="faculty-member-grid">
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=BBM" alt="Shane Xander C. Samonte" class="faculty-image">
+                    <img src="../user/uploads/core.shane.jpg" alt="Shane Xander C. Samonte" class="faculty-image">
                     <h3 class="faculty-name">Shane Xander C. Samonte</h3>
                     <p class="faculty-position">Core Officer</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JPG" alt="Marie Bernadette V. Agustin" class="faculty-image">
+                    <img src="../user/uploads/core.abby.jpg" alt="Marie Bernadette V. Agustin" class="faculty-image">
                     <h3 class="faculty-name">Marie Bernadette V. Agustin</h3>
                     <p class="faculty-position">Core Officer</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JLB" alt="Jamaica C. Magtoto" class="faculty-image">
+                    <img src="../user/uploads/core.jam.jpg" alt="Jamaica C. Magtoto" class="faculty-image">
                     <h3 class="faculty-name">Jamaica C. Magtoto</h3>
                     <p class="faculty-position">Core Officer</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=SB" alt="Jhonas Angelo A. Cañotal" class="faculty-image">
+                    <img src="../user/uploads/core.jhonas.jpg" alt="Jhonas Angelo A. Cañotal" class="faculty-image">
                     <h3 class="faculty-name">Jhonas Angelo A. Cañotal</h3>
                     <p class="faculty-position">Core Officer</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=CCBF" alt="Jay-z Nicolo Reyes" class="faculty-image">
+                    <img src="../user/uploads/core.jayz.jpg" alt="Jay-z Nicolo Reyes" class="faculty-image">
                     <h3 class="faculty-name">Jay-z Nicolo Reyes</h3>
                     <p class="faculty-position">Core Officer</p>
                 </div>
@@ -417,25 +419,25 @@ switch($current_page) {
 
     <div class="faculty-grid">
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Leofred Nuñez" class="faculty-image">
+                    <img src="../user/uploads/4thyr rep.leofred.jpg" alt="Leofred Nuñez" class="faculty-image">
                     <h3 class="faculty-name">Leofred Nuñez</h3>
                     <p class="faculty-position">4th Year Level Representative</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Marielle Nicole G. Silvestre" class="faculty-image">
+                    <img src="../user/uploads/3rdyr rep.maye.jpg" alt="Marielle Nicole G. Silvestre" class="faculty-image">
                     <h3 class="faculty-name">Marielle Nicole G. Silvestre</h3>
                     <p class="faculty-position">3rd Year Level Representative</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Felicity Marie Santos" class="faculty-image">
+                    <img src="../user/uploads/2ndyr rep.felicity.jpg" alt="Felicity Marie Santos" class="faculty-image">
                     <h3 class="faculty-name">Felicity Marie Santos</h3>
                     <p class="faculty-position">2nd Year Level Representative</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Jaylah Leigh M. Biasa" class="faculty-image">
+                    <img src="../user/uploads/1st yr rep.leigh.jpg" alt="Jaylah Leigh M. Biasa" class="faculty-image">
                     <h3 class="faculty-name">Jaylah Leigh M. Biasa</h3>
                     <p class="faculty-position">1st Year Level Representative</p>
                 </div>
@@ -460,31 +462,31 @@ switch($current_page) {
             <!-- First Row: 5 Members -->
             <div class="faculty-member-grid">
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=BBM" alt="Benedict Bryan Montances" class="faculty-image">
+                    <img src="../user/uploads/membership.benedict.jpg" alt="Benedict Bryan Montances" class="faculty-image">
                     <h3 class="faculty-name">Benedict Bryan Montances</h3>
                     <p class="faculty-position">Membership Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JPG" alt="John Paul Galano" class="faculty-image">
+                    <img src="../user/uploads/business.wapol.jpg" alt="John Paul Galano" class="faculty-image">
                     <h3 class="faculty-name">John Paul Galano</h3>
                     <p class="faculty-position">Business Manager/Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JLB" alt="Juliana L. Baguio" class="faculty-image">
+                    <img src="../user/uploads/acad.juliana.jpg" alt="Juliana L. Baguio" class="faculty-image">
                     <h3 class="faculty-name">Juliana L. Baguio</h3>
                     <p class="faculty-position">Academic Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=SB" alt="Seth Brisenio" class="faculty-image">
+                    <img src="../user/uploads/ict.seth.jpg" alt="Seth Brisenio" class="faculty-image">
                     <h3 class="faculty-name">Seth Brisenio</h3>
                     <p class="faculty-position">ICT Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=CCBF" alt="Cleave Cole B. Fresto" class="faculty-image">
+                    <img src="../user/uploads/research.cleave.jpg" alt="Cleave Cole B. Fresto" class="faculty-image">
                     <h3 class="faculty-name">Cleave Cole B. Fresto</h3>
                     <p class="faculty-position">Research Committee Chair</p>
                 </div>
@@ -493,25 +495,25 @@ switch($current_page) {
             <!-- Second Row: 4 Members -->
             <div class="faculty-member-grid-row2">
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JBBS" alt="John Benny B. Socorro" class="faculty-image">
+                    <img src="../user/uploads/membership.benedict.jpg" alt="John Benny B. Socorro" class="faculty-image">
                     <h3 class="faculty-name">John Benny B. Socorro</h3>
                     <p class="faculty-position">Sports Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=ELGF" alt="Elaiza Lujibilla G. Fulgencio" class="faculty-image">
+                    <img src="../user/uploads/event.elaiza.jpg" alt="Elaiza Lujibilla G. Fulgencio" class="faculty-image">
                     <h3 class="faculty-name">Elaiza Lujibilla G. Fulgencio</h3>
                     <p class="faculty-position">Events Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=DM" alt="Denver Masangcay" class="faculty-image">
+                    <img src="../user/uploads/cc.ember.jpg" alt="Denver Masangcay" class="faculty-image">
                     <h3 class="faculty-name">Denver Masangcay</h3>
                     <p class="faculty-position">Community Committee Chair</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=PC" alt="Princess Calimoso" class="faculty-image">
+                    <img src="../user/uploads/environment.cali.jpg" alt="Princess Calimoso" class="faculty-image">
                     <h3 class="faculty-name">Princess Calimoso</h3>
                     <p class="faculty-position">Environmental Committee Chair</p>
                 </div>
@@ -519,7 +521,6 @@ switch($current_page) {
         </div>
     </div>
 </div>
-
 
 <!-- News and Events Section -->
     <?php elseif ($current_page === 'news'): ?>

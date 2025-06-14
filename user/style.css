@@ -597,7 +597,7 @@ body {
     color: #fff;
     text-align: justify;
     padding-left: 2rem;
-    margin-right: 3rem;
+    margin-right: 5.5rem;
 }
 
 .community-section {
@@ -634,38 +634,39 @@ body {
     font-size: 3.5rem;
     font-weight: bold;
     margin-top: 100px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     margin-left: 5rem;
 }
 .cs-society-subtitle {
     font-size: 3rem;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 5rem;
     margin-left: 5rem;
     color: #3EF4E2;
 }
 .cs-society-description {
     font-size: 1.5rem;
     line-height: 1.6;
+    margin: 50px auto 75px auto;
+    max-width: 100rem;
     color: #ffffff;
-    text-align: justify;
-    flex: 1;
-    max-width: 50%;
-    margin: 0;
-    padding-right: 2rem;
-    align-self: center;
-    margin-top: -22rem;
+    text-align: justify;  
+    margin-right: 60rem;
     margin-left: 5rem;
+    margin-top: -25rem;
+    margin-bottom: 5rem;;
 }
 
 .cs-image {
-    flex-shrink: 0;
-    max-width: 700px;
-    width: 40%;
-    margin-left: auto; /* This pushes the image to the right */
-    margin-top: 0; /* Remove the large top margin */
-    margin-right: 2rem; /* Adjust spacing from right edge */
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+    margin-left: 52rem;
+    margin-top: -10rem;
+    max-width: 100%;
+    width: 45%;
+    height: 50%;
+    border-radius: 20px;
 }
 
 .department-head-title {
@@ -720,13 +721,7 @@ body {
             color: #ffffff;
         }
 
-        .executive-faculty-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        
 /*Core Executive Section*/
         .core-executive-section {
             max-width: 1200px;
@@ -778,6 +773,7 @@ body {
     gap: 40px;
     max-width: 1200px;
     margin: 0 auto;
+    align-items: start;
 }
 
 /* Individual Board Faculty Member */
@@ -786,21 +782,7 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-}
-
-/* Board Faculty Image Styling */
-.faculty-image {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #3EF4E2;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease;
-}
-
-.faculty-image:hover {
-    transform: scale(1.05);
+    height: 100%;
 }
 
 /* Faculty Name Styling */
@@ -822,6 +804,32 @@ body {
     max-width: 1200px;
     margin: 100px auto 0 auto;
     text-align: center;
+}
+
+/*Board Executive Section*/
+
+.executive-faculty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+    justify-items: center;
+    padding: 0 10rem;
+    margin-bottom: 2rem;
+}
+
+.executive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+    justify-items: center;
+    padding: 0 10rem;
+    margin-bottom: 2rem;
 }
 
 /* Title Styling */
@@ -884,8 +892,9 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid #3EF4E2;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .faculty-image:hover {
@@ -907,17 +916,6 @@ body {
 }
 
 
-
-
-/* Community Assets*/
-
-.yaKyle {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-}
 /* News Section */
 .news-section {
     display: grid;
@@ -2458,7 +2456,6 @@ body {
 img {
   max-width: 100%;
   height: auto;
-  display: block;
 }
 
 /* Responsive breakpoints for all major devices */
