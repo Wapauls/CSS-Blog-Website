@@ -551,6 +551,7 @@ body {
 }
 
 /* Community Section */
+
 .Community {
     margin-top: 100px;
     align-items: right;
@@ -644,29 +645,29 @@ body {
     margin-left: 5rem;
     color: #3EF4E2;
 }
+
 .cs-society-description {
+    flex: 1;
     font-size: 1.5rem;
     line-height: 1.6;
-    margin: 50px auto 75px auto;
-    max-width: 100rem;
-    color: #ffffff;
-    text-align: justify;  
+    color: #fff;
+    text-align: justify;
+    padding-right: 2rem;
     margin-right: 60rem;
     margin-left: 5rem;
-    margin-top: -25rem;
-    margin-bottom: 5rem;;
+    margin-top: -33rem;
 }
 
+
 .cs-image {
-    display: flex;
-    flex-direction: column;
-    align-items: right;
-    margin-left: 52rem;
-    margin-top: -10rem;
+    flex-shrink: 0;
     max-width: 100%;
-    width: 45%;
-    height: 50%;
-    border-radius: 20px;
+    width: 40%;
+    height: 100%;
+    margin-bottom: 5rem;
+    margin-top: 4rem;
+    margin-left: 57rem;
+    border-radius: 10px;
 }
 
 .department-head-title {

@@ -204,9 +204,7 @@ switch($current_page) {
 <!-- Community Section -->
 
     <?php elseif ($current_page === 'community'): ?>
-        <div class="community-title">
-            <h1 class="community-header"> Our <span class="highlight"> Community </span> </div>
-
+ 
     <div class="community-container">
         <h1 class="Community"> NextGen <span class="highlight-community">CSS</span></h1>
 
