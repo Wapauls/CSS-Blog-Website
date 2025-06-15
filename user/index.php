@@ -12,9 +12,12 @@ switch($current_page) {
     case 'about':
         $about_entries = $conn->query('SELECT * FROM about ORDER BY created_at DESC');
         break;
+<<<<<<< HEAD
     case 'community':
         $community_entries = $conn->query('SELECT * FROM community ORDER BY created_at DESC');
         break;
+=======
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
     case 'news':
         $news_entries = $conn->query('SELECT * FROM news ORDER BY event_date DESC');
         break;
@@ -30,12 +33,19 @@ switch($current_page) {
     <meta charset="UTF-8">
     <title>CSS Blog - <?= ucfirst($current_page) ?></title>
     <link rel="stylesheet" href="style.css">
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="binary-animation.js" defer></script>
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
+<<<<<<< HEAD
         <div class="nav-container">
             <a href="index.php" class="logo">
                 <img src="../assets/images/logo.png" />
@@ -61,6 +71,39 @@ switch($current_page) {
     </nav>
 
     <!-- Main Content -->
+=======
+    <div class="nav-container">
+        <div class="logo">
+            <img src="../uploads/logo.png" alt="Department Logo" class="dept-logo">
+        </div>
+
+        <div class="nav-links">
+            <a href="index.php" class="<?= $current_page === 'home' ? 'active' : '' ?>">Home</a>
+            <a href="?page=about" class="<?= $current_page === 'about' ? 'active' : '' ?>">About</a>
+            <a href="?page=community" class="<?= $current_page === 'community' ? 'active' : '' ?>">Community</a>
+            <a href="?page=news" class="<?= $current_page === 'news' ? 'active' : '' ?>">News and Events</a>
+            <a href="?page=developers" class="<?= $current_page === 'developers' ? 'active' : '' ?>">Developers</a>
+        </div>
+
+        <!-- Burger Menu -->
+        <div class="burger-menu" id="burgerMenu">
+            <div class="burger-line"></div>
+            <div class="burger-line"></div>
+            <div class="burger-line"></div>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="index.php" class="<?= $current_page === 'home' ? 'active' : '' ?>">Home</a>
+    <a href="?page=about" class="<?= $current_page === 'about' ? 'active' : '' ?>">About</a>
+    <a href="community.php">Community</a>
+    <a href="?page=news" class="<?= $current_page === 'news' ? 'active' : '' ?>">News and Events</a>
+    <a href="?page=developers" class="<?= $current_page === 'developers' ? 'active' : '' ?>">Developers</a>
+</div>
+
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
     <?php if ($current_page === 'home'): ?>
         <!-- Hero Section -->
         <section class="hero">
@@ -81,7 +124,11 @@ switch($current_page) {
                         <div class="feature-pill-same"><span class="highlight-letter">S</span>hine</div>
                     </div>
                 </div>
+<<<<<<< HEAD
                 <img src="../assets/images/bscslogo.png" alt="Logo" class="hero-department-logo">
+=======
+                <img src="../uploads/bscslogo.png" alt="Logo" class="hero-department-logo">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
             </div>
         </section>
 
@@ -92,7 +139,11 @@ switch($current_page) {
                     <div class="feature-cards">
                         <div class="feature-card">
                             <div class="feature-icon">
+<<<<<<< HEAD
                                 <img src="../assets/images/code.png" alt="Code Icon">
+=======
+                                <img src="../uploads/code.png" alt="Code Icon">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             </div>
                             <div class="feature-text">
                                 <h3>Code</h3>
@@ -101,7 +152,11 @@ switch($current_page) {
                         </div>
                         <div class="feature-card dark">
                             <div class="feature-icon">
+<<<<<<< HEAD
                                 <img src="../assets/images/style.png" alt="Style Icon">
+=======
+                                <img src="../uploads/style.png" alt="Style Icon">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             </div>
                             <div class="feature-text">
                                 <h3>Style</h3>
@@ -110,7 +165,11 @@ switch($current_page) {
                         </div>
                         <div class="feature-card">
                             <div class="feature-icon">
+<<<<<<< HEAD
                                 <img src="../assets/images/shine.png" alt="Shine Icon">
+=======
+                                <img src="../uploads/shine.png" alt="Shine Icon">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             </div>
                             <div class="feature-text">
                                 <h3>Shine</h3>
@@ -123,8 +182,13 @@ switch($current_page) {
                     <h1 class="institution-title">Our <span class="highlight">Institution</span></h1>
                     <p class="institution-description">The SCC Computer Science Society (SCC-CSS) operates as the official academic organization of the Computer Science Department under the guidance of the Center for Online Education System (COES) at St. Clare College. Anchored in the values of excellence and integrity, SCC-CSS is dedicated to promoting academic excellence and providing quality services to both internal and external stakeholders.</p>
                     <div class="logo-group">
+<<<<<<< HEAD
                         <img src="../assets/images/scc.png" alt="SCC Logo" class="institution-logo">
                         <img src="../assets/images/sco.png" alt="SCO Logo" class="institution-logo">
+=======
+                        <img src="../uploads/scc.png" alt="SCC Logo" class="institution-logo">
+                        <img src="../uploads/sco.png" alt="SCO Logo" class="institution-logo">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                     </div>
                 </div>
             </div>
@@ -134,6 +198,7 @@ switch($current_page) {
             <h2>Our <span>Partners</span></h2>
             <div class="partners-container">
                 <div class="partner-logo">
+<<<<<<< HEAD
                     <img src="../assets/images/sco.png" alt="SCO Online">
                 </div>
                 <div class="partner-logo">
@@ -150,6 +215,24 @@ switch($current_page) {
                 </div>
                 <div class="partner-logo">
                     <img src="../assets/images/meta.png" alt="Meta">
+=======
+                    <img src="../uploads/sco.png" alt="SCO Online">
+                </div>
+                <div class="partner-logo">
+                    <img src="../uploads/acer.png" alt="Acer">
+                </div>
+                <div class="partner-logo">
+                    <img src="../uploads/edusuite.png" alt="Edusuite">
+                </div>
+                <div class="partner-logo">
+                    <img src="../uploads/predator.png" alt="Predator">
+                </div>
+                <div class="partner-logo">
+                    <img src="../uploads/knights.png" alt="Knights">
+                </div>
+                <div class="partner-logo">
+                    <img src="../uploads/meta.png" alt="Meta">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                 </div>
             </div>
         </section>
@@ -163,7 +246,11 @@ switch($current_page) {
                         <div class="post">
                             <h2><?= htmlspecialchars($row['title']) ?></h2>
                             <?php if ($row['image']): ?>
+<<<<<<< HEAD
                                 <img src="../assets/images/<?= htmlspecialchars($row['image']) ?>" alt="">
+=======
+                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             <?php endif; ?>
                             <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                             <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
@@ -174,16 +261,27 @@ switch($current_page) {
                 <?php endif; ?>
             </div>
         </div>
+<<<<<<< HEAD
         
         <?php elseif ($current_page === 'about'): ?>
             <h1>About Us</h1>
+=======
+
+    <?php elseif ($current_page === 'about'): ?>
+        <div class="container">
+            <h2 class="section-title">About <span>Us</span></h2>
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
             <div class="about-section">
                 <?php if ($about_entries && $about_entries->num_rows > 0): ?>
                     <?php while ($row = $about_entries->fetch_assoc()): ?>
                         <div class="about-entry">
                             <h2><?= htmlspecialchars($row['title']) ?></h2>
                             <?php if ($row['image']): ?>
+<<<<<<< HEAD
                                 <img src="../assets/images/<?= htmlspecialchars($row['image']) ?>" alt="">
+=======
+                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             <?php endif; ?>
                             <div class="content">
                                 <?= nl2br(htmlspecialchars($row['content'])) ?>
@@ -194,6 +292,7 @@ switch($current_page) {
                     <p class="no-content">About content coming soon.</p>
                 <?php endif; ?>
             </div>
+<<<<<<< HEAD
 
         <?php elseif ($current_page === 'community'): ?>
             <h1>Our Community</h1>
@@ -220,13 +319,337 @@ switch($current_page) {
 
         <?php elseif ($current_page === 'news'): ?>
             <h1>News & Events</h1>
+=======
+        </div>
+
+<!-- Community Section -->
+
+    <?php elseif ($current_page === 'community'): ?>
+    <div class="community-container">
+        <h1 class="Community"> NextGen <span class="highlight-community">CSS</span></h1>
+
+        <div class="campaign-container">
+            <img src="../uploads/css-campaign.png" alt="Campaign" class="Campaign-image">
+                <p class="Community-description">We, the Computer Science Society (CSS) community, are committed to building a progressive and inclusive society.<br><br>
+                    Rooted in innovation and driven by purpose, we aim to empower Clarean students to lead with integrity, collaborate with intention, and thrive in the evolving world of Information and Computing Sciences.<br><br>
+                        Through the Progressive CSS Campaign, we foster a culture of excellence, growth, and shared knowledge.<br><br>
+                            We envision a future where every member is equipped, inspired, and united in shaping meaningful change through technology.<br></p>
+        </div>
+
+        <div class="cs-society-section">
+    <div class="cs-society-text">
+        <h1 class="cs-society-title">Clarean CS Society:</h1>
+            <h2 class="cs-society-subtitle">Code. Connect. Create.</h2>
+                <p class="cs-society-description">The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation.</p>
+        <p class="cs-society-description">We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world.</p>
+    </div>
+    <img src="../uploads/hartsdeh.jpg" alt="CS Society" class="CS-Society">
+</div>
+
+
+</div>
+    </div>
+
+    <div class="department-section">
+        <div class="department-head-container">
+            <h1 class="department-head-title"> The <span class="highlight">Department Head and Adviser<br><br></span></h1>
+                <p class="department-head-description"> Our dedicated adviser after invaluable experience and insight, providing strategic guidance and mentorship to support our members in achieving both academic excellence and professional growth.<br><br></p>   
+                    <img src="../uploads/logo.png" class="adviser-image" alt="adviser-image"> <!--Placeholder Only -->   
+                        <h2 class="adviser-name"> Ms. Jeanethjoy D. Naturales </h2>
+                            <p class="adviser-position">Department Head and Adviser </p>
+        </div>
+    </div>
+
+    <div class="board-faculty-section">
+        <h1 class="board-faculty-title"> The <span class="highlight"> Board of Academic Faculty </h1> 
+            <p class="board-faculty-description"> The Board of Academic Faculty is composed of esteemed educators and subject matter experts who contribute to the intellectual foundation of the society. They provide academic guidance, uphold scholarly standards, and support the holistic development of students within the field of Information and Computing Sciences. </p>
+                    <div class="faculty-container">
+
+            <div class="faculty-grid"> <!--First Row-->
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Ms. Maireen Baltazar" class="faculty-image">
+                    <h3 class="faculty-name">Ms. Maireen Baltazar</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Ms. May Ann Maniego" class="faculty-image">
+                    <h3 class="faculty-name">Ms. May Ann Maniego</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Mr. Enrico Columna" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Enrico Columna</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Mr. Alvin Gallo" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Alvin Gallo</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+            </div>
+
+            <div class="faculty-grid"> <!--Second Row-->
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Mr. Hobel Dioquino" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Hobel Dioquino</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Mr. Julius Abendano" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Julius Abendano</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Mr. Erwin Guerra" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Erwin Guerra</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Mr. Rafaelito Quimora" class="faculty-image">
+                    <h3 class="faculty-name">Mr. Rafaelito Quimora</h3>
+                    <p class="faculty-position">BSCS Faculty</p>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<!-- Board of Executive Section -->
+
+<div class="board-executive-section">
+    <h1 class="board-executive-title">The
+        <span class="highlight">Board of Executive</span>
+    </h1>
+    <p class="board-executive-description">
+        The Executive Board comprises committed and experienced leaders who provide strategic direction to the society, driving its mission and fostering excellence in the field of information and Computing Sciences. </p>
+        <div class="board-executive-container">
+        <div class="faculty-grid"> <!--First Row-->
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Kyle Vincent Z. Pasuquin" class="faculty-image">
+                    <h3 class="faculty-name">Kyle Vincent Z. Pasuquin</h3>
+                    <p class="faculty-position">Departmental President</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Jake Russel Belen" class="faculty-image">
+                    <h3 class="faculty-name">Jake Russel Belen</h3>
+                    <p class="faculty-position">Vice-President Internal</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Raine E.Esparrago" class="faculty-image">
+                    <h3 class="faculty-name">Raine E.Esparrago</h3>
+                    <p class="faculty-position">Vice-President External</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Clariss Mae D. Selisana" class="faculty-image">
+                    <h3 class="faculty-name">Clariss Mae D. Selisana</h3>
+                    <p class="faculty-position">Departmental Secretary</p>
+                </div>
+            </div>
+
+            <div class="executive-faculty-grid"> <!--Second Row-->
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Shenmar Bonifacio" class="faculty-image">
+                    <h3 class="faculty-name">Shenmar Bonifacio</h3>
+                    <p class="faculty-position">Departmental Treasurer</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Jahn Florence Balili" class="faculty-image">
+                    <h3 class="faculty-name">Jahn Florence Balili</h3>
+                    <p class="faculty-position">Departmental Auditor</p>
+                </div>
+        </div>
+    </div>
+
+    <!--Core Executive Section -->
+
+    <div class="core-executive-section">
+        <h1 class="core-executive-title">The
+            <span class="highlight">Core Executive</span>
+        </h1>
+    </div>
+
+    <div class="core-executive-container">
+            <p class="core-executive-description">The Core Executive Board is composed of dedicated and capable leaders who play a vital role in shaping the vision of the society, providing strategic leadership, and advancing excellence in the field of Information and Computing Sciences.</p>
+        </div>
+
+    <div class="faculty-member-grid">
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=BBM" alt="Shane Xander C. Samonte" class="faculty-image">
+                    <h3 class="faculty-name">Shane Xander C. Samonte</h3>
+                    <p class="faculty-position">Core Officer</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JPG" alt="Marie Bernadette V. Agustin" class="faculty-image">
+                    <h3 class="faculty-name">Marie Bernadette V. Agustin</h3>
+                    <p class="faculty-position">Core Officer</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JLB" alt="Jamaica C. Magtoto" class="faculty-image">
+                    <h3 class="faculty-name">Jamaica C. Magtoto</h3>
+                    <p class="faculty-position">Core Officer</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=SB" alt="Jhonas Angelo A. Cañotal" class="faculty-image">
+                    <h3 class="faculty-name">Jhonas Angelo A. Cañotal</h3>
+                    <p class="faculty-position">Core Officer</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=CCBF" alt="Jay-z Nicolo Reyes" class="faculty-image">
+                    <h3 class="faculty-name">Jay-z Nicolo Reyes</h3>
+                    <p class="faculty-position">Core Officer</p>
+                </div>
+            </div>
+    </div>
+
+<!-- Board of Year-level Representatives Section -->
+
+<div class="board-year-level-section">
+    <h1 class="board-year-level-title">The
+        <span class="highlight">Board of Year-level Representatives</span>
+    </h1>
+        
+        <div class="board-year-level-container">
+            <p class="board-year-level-description">The Board of Year-Level Representatives is composed of student leaders from each academic level who serve as the voice of their peers, fostering active engagement, promoting inclusivity, and supporting the society's mission within the field of Information and Computing Sciences.</p>
+        </div>
+
+    <div class="faculty-grid">
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Leofred Nuñez" class="faculty-image">
+                    <h3 class="faculty-name">Leofred Nuñez</h3>
+                    <p class="faculty-position">4th Year Level Representative</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Marielle Nicole G. Silvestre" class="faculty-image">
+                    <h3 class="faculty-name">Marielle Nicole G. Silvestre</h3>
+                    <p class="faculty-position">3rd Year Level Representative</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Felicity Marie Santos" class="faculty-image">
+                    <h3 class="faculty-name">Felicity Marie Santos</h3>
+                    <p class="faculty-position">2nd Year Level Representative</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Jaylah Leigh M. Biasa" class="faculty-image">
+                    <h3 class="faculty-name">Jaylah Leigh M. Biasa</h3>
+                    <p class="faculty-position">1st Year Level Representative</p>
+                </div>
+            </div>
+
+
+
+<!-- Commitee Board Section -->
+
+<div class="committee-board-section">
+    <div class="faculty-member-section">
+        <h1 class="board-faculty-title">The
+            <span class="highlight">Operations & Committees Board</span>
+        </h1>
+        
+        <p class="board-faculty-description">
+        The Operations & Committees Board is composed of committee chairs and functional officers who lead the society's core initiatives and activities. Through their specialized roles, they ensure the effective implementation of programs, promote collaboration, and uphold the society's commitment to excellence in the field of Information and Computing Sciences.
+        </p>
+    </div>
+
+        <div class="faculty-container">
+            <!-- First Row: 5 Members -->
+            <div class="faculty-member-grid">
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=BBM" alt="Benedict Bryan Montances" class="faculty-image">
+                    <h3 class="faculty-name">Benedict Bryan Montances</h3>
+                    <p class="faculty-position">Membership Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JPG" alt="John Paul Galano" class="faculty-image">
+                    <h3 class="faculty-name">John Paul Galano</h3>
+                    <p class="faculty-position">Business Manager/Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JLB" alt="Juliana L. Baguio" class="faculty-image">
+                    <h3 class="faculty-name">Juliana L. Baguio</h3>
+                    <p class="faculty-position">Academic Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=SB" alt="Seth Brisenio" class="faculty-image">
+                    <h3 class="faculty-name">Seth Brisenio</h3>
+                    <p class="faculty-position">ICT Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=CCBF" alt="Cleave Cole B. Fresto" class="faculty-image">
+                    <h3 class="faculty-name">Cleave Cole B. Fresto</h3>
+                    <p class="faculty-position">Research Committee Chair</p>
+                </div>
+            </div>
+
+            <!-- Second Row: 4 Members -->
+            <div class="faculty-member-grid-row2">
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=JBBS" alt="John Benny B. Socorro" class="faculty-image">
+                    <h3 class="faculty-name">John Benny B. Socorro</h3>
+                    <p class="faculty-position">Sports Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=ELGF" alt="Elaiza Lujibilla G. Fulgencio" class="faculty-image">
+                    <h3 class="faculty-name">Elaiza Lujibilla G. Fulgencio</h3>
+                    <p class="faculty-position">Events Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=DM" alt="Denver Masangcay" class="faculty-image">
+                    <h3 class="faculty-name">Denver Masangcay</h3>
+                    <p class="faculty-position">Community Committee Chair</p>
+                </div>
+
+                <div class="faculty-member">
+                    <img src="https://via.placeholder.com/180x180/00d4ff/ffffff?text=PC" alt="Princess Calimoso" class="faculty-image">
+                    <h3 class="faculty-name">Princess Calimoso</h3>
+                    <p class="faculty-position">Environmental Committee Chair</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- News and Events Section -->
+    <?php elseif ($current_page === 'news'): ?>
+        <div class="container">
+            <h2 class="section-title">News & <span>Events</span></h2>
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
             <div class="news-section">
                 <?php if ($news_entries && $news_entries->num_rows > 0): ?>
                     <?php while ($row = $news_entries->fetch_assoc()): ?>
                         <div class="news-entry">
                             <h2><?= htmlspecialchars($row['title']) ?></h2>
                             <?php if ($row['image']): ?>
+<<<<<<< HEAD
                                 <img src="../assets/images/<?= htmlspecialchars($row['image']) ?>" alt="">
+=======
+                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                             <?php endif; ?>
                             <div class="event-date">
                                 <i class="far fa-calendar-alt"></i> <?= date('F j, Y', strtotime($row['event_date'])) ?>
@@ -240,6 +663,7 @@ switch($current_page) {
                     <p class="no-content">No upcoming events at this time.</p>
                 <?php endif; ?>
             </div>
+<<<<<<< HEAD
 
             <?php elseif ($current_page === 'developers'): ?>
     <h1 class="developer-title">Meet Our Developers</h1>
@@ -299,6 +723,45 @@ switch($current_page) {
                 <div class="footer-left">
                     <div class="footer-logo-container">
                         <img src="../assets/images/transparentlogo.png" alt="CSS Logo" class="footer-logo">
+=======
+        </div>
+        
+<!-- Developers Section -->
+    <?php elseif ($current_page === 'developers'): ?>
+        <div class="container">
+            <h2 class="section-title">Our <span>Developers</span></h2>
+            <div class="developers-section">
+                <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
+                    <?php while ($row = $dev_entries->fetch_assoc()): ?>
+                        <div class="developer-entry">
+                            <h2><?= htmlspecialchars($row['title']) ?></h2>
+                            <?php if ($row['image']): ?>
+                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                            <?php endif; ?>
+                            <div class="content">
+                                <?= nl2br(htmlspecialchars($row['content'])) ?>
+                            </div>
+                            <?php if ($row['github_link']): ?>
+                                <a href="<?= htmlspecialchars($row['github_link']) ?>" target="_blank" class="github-link">
+                                    <i class="fab fa-github"></i> View GitHub Profile
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p class="no-content">Developer profiles coming soon.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+ <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                    <div class="footer-logo-container">
+                        <img src="../uploads/transparentlogo.png" alt="CSS Logo" class="footer-logo">
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
                     </div>
                     <p class="footer-tagline">Built with love, code, and caffeine by CSS ☕️</p>
                 </div>
@@ -330,7 +793,11 @@ switch($current_page) {
                 </div>
             </div>
         </footer>
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Navigation elements
@@ -431,4 +898,8 @@ switch($current_page) {
     window.addEventListener('load', createBinaryRain);
     </script>
 </body>
+<<<<<<< HEAD
 </html> 
+=======
+</html>
+>>>>>>> 3a7fc5ef1901c98d5d262bc0581c475a8101c5fc
