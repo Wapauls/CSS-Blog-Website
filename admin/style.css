@@ -766,8 +766,8 @@ table, th, td {
 }
 
 .post-row {
-    display: grid;
-    grid-template-columns: auto 1fr 2fr auto ;
+    display: flex;
+    flex-direction: row;
     gap: 1.5rem;
     align-items: center;
     background: #181c20;
@@ -798,6 +798,15 @@ table, th, td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+}
+
+.post-role {
+    flex: 1;
+}
+
+.role-tag {
+    flex: 1;
 }
 
 .post-content {
@@ -812,6 +821,7 @@ table, th, td {
     max-height: 4.5em;
     overflow: hidden;
     opacity: 0.9;
+    flex: 2;
 }
 
 .post-info {
@@ -1242,3 +1252,74 @@ table, th, td {
     color: #000;
 }
 
+    /* Link Entry Styles */
+    .link-entry {
+        display: grid;
+        grid-template-columns: 150px 1fr auto;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+        background: #fff;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .link-type {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: #fff;
+        color: #495057;
+    }
+
+    .link-entry input[type="url"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: #fff;
+        color: #495057;
+    }
+
+    .remove-link {
+        background: #f8f9fa;
+        color: #dc3545;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+    }
+
+    .remove-link:hover {
+        background: #dc3545;
+        color: #fff;
+        border-color: #dc3545;
+    }
+
+    .add-link-btn {
+        background: #e9ecef;
+        color: #495057;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 8px 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9em;
+    }
+
+    .add-link-btn:hover {
+        background: #dee2e6;
+        color: #212529;
+    }

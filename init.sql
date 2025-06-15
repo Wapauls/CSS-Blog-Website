@@ -41,10 +41,9 @@ CREATE TABLE IF NOT EXISTS developers (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     roles TEXT NOT NULL,
-    skills TEXT NOT NULL,
-    links TEXT NOT NULL,
+    fb_links TEXT NOT NULL,
+    github_links TEXT NOT NULL,
     image VARCHAR(255),
-    github_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 

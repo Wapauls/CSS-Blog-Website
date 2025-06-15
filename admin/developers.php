@@ -35,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
         $roles = trim($_POST['roles'] ?? '');
-        $skills = trim($_POST['skills'] ?? '');
+        $fb_links = trim($_POST['fb_links'] ?? '');
+        $github_links = trim($_POST['github_links'] ?? '');
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -77,9 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ?, image = NULL WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, image = NULL WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssssi', $title, $content, $roles, $skills, $id);
+                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -93,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ?, image = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, image = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssssi', $title, $content, $roles, $skills, $image, $id);
+                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $image, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -106,9 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // No image change case
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, skills = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('ssssi', $title, $content, $roles, $skills, $id);
+                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -121,9 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO developers (title, content, roles, skills, image) VALUES (?, ?, ?, ?, ?)');
+            $stmt = $conn->prepare('INSERT INTO developers (title, content, roles, fb_links, github_links, image) VALUES (?, ?, ?, ?, ?, ?)');
             if ($stmt) {
-                $stmt->bind_param('sssss', $title, $content, $roles, $skills, $image);
+                $stmt->bind_param('ssssss', $title, $content, $roles, $fb_links, $github_links, $image);
                 if ($stmt->execute()) {
                     header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
                     exit();
@@ -232,19 +233,9 @@ $current_page = 'developers';
                                 }
                                 ?>
                             </div>
-                            <div class="skills">
-                                <?php
-                                $skills = explode("\n", $row['skills']);
-                                foreach ($skills as $skill) {
-                                    if (trim($skill) !== '') {
-                                        echo '<span class="skill-tag">' . htmlspecialchars(trim($skill)) . '</span>';
-                                    }
-                                }
-                                ?>
-                            </div>
                         </div>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-roles="<?= htmlspecialchars($row['roles']) ?>" data-skills="<?= htmlspecialchars($row['skills']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-roles="<?= htmlspecialchars($row['roles']) ?>" data-fb="<?= htmlspecialchars($row['fb_links']) ?>" data-git="<?= htmlspecialchars($row['github_links']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -333,7 +324,8 @@ $current_page = 'developers';
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
                     roles: btn.getAttribute('data-roles'),
-                    skills: btn.getAttribute('data-skills'),
+                    fb_links: btn.getAttribute('data-fb'),
+                    github_links: btn.getAttribute('data-git'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -398,8 +390,12 @@ $current_page = 'developers';
                                 <textarea id="createRoles" name="roles" placeholder="Enter developer roles (one per line)..." required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="createSkills"><i class="fas fa-code"></i> Skills</label>
-                                <textarea id="createSkills" name="skills" placeholder="Enter developer skills (one per line)..." required></textarea>
+                                <label for="createFb"><i class="fas fa-code"></i> Facebook link</label>
+                                <textarea id="createFb" name="fb_links" placeholder="Enter developer facebook link" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="createGit"><i class="fas fa-code"></i> Github link</label>
+                                <textarea id="createGit" name="github_links" placeholder="Enter developer github link" required></textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
@@ -438,8 +434,12 @@ $current_page = 'developers';
                                 <textarea id="editRoles" name="roles" required>${data.roles}</textarea>
                             </div>
                             <div class="form-group">
-                                <label for="editSkills"><i class="fas fa-code"></i> Skills</label>
-                                <textarea id="editSkills" name="skills" required>${data.skills}</textarea>
+                                <label for="editFb"><i class="fas fa-code"></i> Facebook link</label>
+                                <textarea id="editFb" name="fb_links" required>${data.fb}</textarea>
+                            </div>
+                                                        <div class="form-group">
+                                <label for="editGit"><i class="fas fa-code"></i> Github link</label>
+                                <textarea id="editGit" name="github_links" required>${data.git}</textarea>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
