@@ -205,31 +205,35 @@ switch($current_page) {
 
     <?php elseif ($current_page === 'community'): ?>
  
-    <div class="community-container">
-        <h1 class="Community"> NextGen <span class="highlight-community">CSS</span></h1>
-
-        <div class="campaign-container">
-            <img src="/user/uploads/css-campaign.png" alt="Campaign" class="campaign-image">
-                <p class="Community-description">We, the Computer Science Society (CSS) community, are committed to building a progressive and inclusive society.<br><br>
-                    Rooted in innovation and driven by purpose, we aim to empower Clarean students to lead with integrity, collaborate with intention, and thrive in the evolving world of Information and Computing Sciences.<br><br>
-                        Through the Progressive CSS Campaign, we foster a culture of excellence, growth, and shared knowledge.<br><br>
-                            We envision a future where every member is equipped, inspired, and united in shaping meaningful change through technology.<br></p>
-        </div>
-
-    <div class="cs-society-section">
-        <div class="cs-society-text">
-            <div class="cs-society-header">   
-                <h1 class="cs-society-title">Clarean CS Society:</h1>
-                    <h2 class="cs-society-subtitle">Code. Connect. Create.</h2>
-        </div>
-
-        <div class="cs-society-content">
-            <img src="../user/uploads/hartsdeh.jpg" alt="CS Society" class="cs-image">         
-                <p class="cs-society-description">The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation. <br> <br>
-                    We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world. </p>
-        </div>
+     <div class="community-container">
+        <h1 class="Community">
+            NextGen <span class="highlight-community">CSS</span>
+        </h1>
+        
+        <img src="/user/uploads/css-campaign.png" alt="Campaign" class="campaign-picture">
+        
+        <p class="Community-description">
+            We, the Computer Science Society (CSS) community, are committed to building a progressive and inclusive society.<br><br>
+            Rooted in innovation and driven by purpose, we aim to empower Clarean students to lead with integrity, collaborate with intention, and thrive in the evolving world of Information and Computing Sciences.<br><br>
+            Through the Progressive CSS Campaign, we foster a culture of excellence, growth, and shared knowledge.<br><br>
+            We envision a future where every member is equipped, inspired, and united in shaping meaningful change through technology.
+        </p>
     </div>
-</div>
+
+     <div class="cs-society-section">
+        <h1 class="cs-society-title">
+            Clarean CS Society: <br> 
+            <span class="highlight">Code. Connect. Create.</span>
+        </h1>
+        
+        <p class="cs-society-description">
+            The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation. 
+            <br><br>
+            We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world.
+        </p>
+        
+        <img src="../user/uploads/hartsdeh.jpg" alt="CS Society" class="cs-image">
+    </div>
 
 
 </div>
@@ -239,7 +243,7 @@ switch($current_page) {
         <div class="department-head-container">
             <h1 class="department-head-title"> The <span class="highlight">Department Head and Adviser<br><br></span></h1>
                 <p class="department-head-description"> Our dedicated adviser after invaluable experience and insight, providing strategic guidance and mentorship to support our members in achieving both academic excellence and professional growth.<br><br></p>   
-                    <img src="../uploads/logo.png" class="adviser-image" alt="adviser-image"> <!--Placeholder Only -->   
+                    <img src="../user/uploads/bscslogo.png" class="adviser-image" alt="adviser-image"> <!--Placeholder Only -->   
                         <h2 class="adviser-name"> Ms. Jeanethjoy D. Naturales </h2>
                             <p class="adviser-position">Department Head and Adviser </p>
         </div>
@@ -252,25 +256,25 @@ switch($current_page) {
 
             <div class="faculty-grid"> <!--First Row-->
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Ms. Maireen Baltazar" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Ms. Maireen Baltazar" class="faculty-image">
                     <h3 class="faculty-name">Ms. Maireen Baltazar</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Ms. May Ann Maniego" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Ms. May Ann Maniego" class="faculty-image">
                     <h3 class="faculty-name">Ms. May Ann Maniego</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Mr. Enrico Columna" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Enrico Columna" class="faculty-image">
                     <h3 class="faculty-name">Mr. Enrico Columna</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Mr. Alvin Gallo" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Alvin Gallo" class="faculty-image">
                     <h3 class="faculty-name">Mr. Alvin Gallo</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
@@ -278,25 +282,25 @@ switch($current_page) {
 
             <div class="faculty-grid"> <!--Second Row-->
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MB" alt="Mr. Hobel Dioquino" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Hobel Dioquino" class="faculty-image">
                     <h3 class="faculty-name">Mr. Hobel Dioquino</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=MAM" alt="Mr. Julius Abendano" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Julius Abendano" class="faculty-image">
                     <h3 class="faculty-name">Mr. Julius Abendano</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=EC" alt="Mr. Erwin Guerra" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Erwin Guerra" class="faculty-image">
                     <h3 class="faculty-name">Mr. Erwin Guerra</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
 
                 <div class="faculty-member">
-                    <img src="https://via.placeholder.com/200x200/00d4ff/ffffff?text=AG" alt="Mr. Rafaelito Quimora" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="Mr. Rafaelito Quimora" class="faculty-image">
                     <h3 class="faculty-name">Mr. Rafaelito Quimora</h3>
                     <p class="faculty-position">BSCS Faculty</p>
                 </div>
@@ -493,7 +497,7 @@ switch($current_page) {
             <!-- Second Row: 4 Members -->
             <div class="faculty-member-grid-row2">
                 <div class="faculty-member">
-                    <img src="../user/uploads/membership.benedict.jpg" alt="John Benny B. Socorro" class="faculty-image">
+                    <img src="../user/uploads/bscslogo.png" alt="John Benny B. Socorro" class="faculty-image">
                     <h3 class="faculty-name">John Benny B. Socorro</h3>
                     <p class="faculty-position">Sports Committee Chair</p>
                 </div>
