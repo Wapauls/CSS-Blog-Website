@@ -21,7 +21,6 @@ body {
 /* Base Navigation Styles (Enhanced) */
 .navbar {
     background-color: rgba(0, 0, 0, 0.1);
-
     position: fixed;
     top: 0;
     left: 0;
@@ -29,7 +28,7 @@ body {
     z-index: 1000;
     padding: 2rem 0;
     transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
 }
 
 .navbar.scrolled {
@@ -55,6 +54,10 @@ body {
     margin-left: 0;
     padding-top: 10px;
     padding-bottom: 10px;
+}
+
+.logo img {
+object-fit: cover;
 }
 
 .dept-logo {
@@ -96,6 +99,48 @@ body {
     }
 }
 
+/*  Sections  */
+
+.commu-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+
+}
+
+.soc-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+
+}
+
+.dept-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+
+}
+
+.executive-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+}
+
+.core-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+}
+
+.board-yr-level-sect {
+    border-bottom: 2px solid white;
+    margin: 150px;
+}
+
+
+
+/*  End of Sections  */
+
+
+
+
 .navbar.scrolled .logo {
     transform: none;
     margin-left: 0;
@@ -106,7 +151,7 @@ body {
 }
 
 .logo img {
-    max-height: 50rem;
+    max-height: 100rem;
     max-width: 250rem;
     width: auto;
     height: auto;
@@ -295,6 +340,7 @@ body {
 
     .navbar.scrolled .logo img {
         height: 60px;
+       
     }
 }
 
@@ -456,6 +502,7 @@ body {
 
 .hero-department-logo {
     position: absolute;
+    border-radius: 50%;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
@@ -567,6 +614,7 @@ body {
     max-width: 1500px;
     margin: 0 auto;
     margin-top: 100px;
+    margin-bottom: 3rem;
 }
 
 
@@ -574,21 +622,18 @@ body {
     grid-area: head;
     font-size: 4rem;
     text-align: right;
+    margin-right: 3rem;
     margin-bottom: 2rem;
+    margin-top: 5rem;
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-right: 3rem;
-    background: linear-gradient(5deg, #00ffff, #0080ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
     color: #3EF4E2; /* fallback for browsers that don't support background-clip */
 }
 
 .highlight-community {
     color: #ffffff;
-    -webkit-text-fill-color: #ffffff; /* Override the transparent fill for this span */
+
 }
 
 .campaign-image {
@@ -619,62 +664,6 @@ body {
     }
 
 
-
-.cs-society-section {
-    display: grid;
-    grid-template-areas: 
-        "head head"
-        "content side";
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-    gap: 2rem;
-    padding: 2rem;
-    max-width: 1500px;
-    margin: 0 auto;
-    margin-left: 5rem;
-}
-
-.cs-society-title {
-    grid-area: head;
-    font-size: 3rem;
-    font-weight: bold;
-    text-align: left;
-    margin-bottom: 2rem;
-    padding-left: 2rem;
-}
-
-
-.highlight {
-    color: #00ffff;
-    background: linear-gradient(45deg, #00ffff, #0080ff);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.cs-society-description {
-    grid-area: content;
-    font-size: 1.1rem;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    text-align: justify;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #0a0a0a;
-    color: white;
-    line-height: 1.6;
-}
-
 .cs-society-section {
     display: grid;
     grid-template-areas: 
@@ -686,27 +675,27 @@ body {
     gap: 2rem;
     padding: 2rem;
     max-width: 1200px;
-    margin: 0 auto;
     margin-left: 5rem;
 }
 
 .cs-society-title {
+    margin-top: 5rem;
     grid-area: head;
     font-size: 3rem;
     font-weight: bold;
     text-align: left;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    margin-left: 2rem; /* Reduced from 2rem */
+    line-height: 1.1; /* Added to tighten line spacing */
 }
 
 .highlight {
     color: #00ffff;
-    background: linear-gradient(45deg, #00ffff, #0080ff);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    line-height: 1.1; /* Added to match the title */
 }
 
 .cs-society-description {
+    height: 500px;
     grid-area: content;
     font-size: 1.5rem;
     padding: 2rem;
@@ -721,8 +710,9 @@ body {
     height: auto;
     border-radius: 10px;
     object-fit: cover;
-    box-shadow: 0 5px 25px rgba(0, 255, 255, 0.3);
-    margin-left: 10rem;
+    box-shadow: 5px 5px 1px rgba(0, 255, 255, 0.3);
+    margin-left: 19rem;
+    margin-right: 7rem;
 }
 
 .department-head-title {
@@ -734,6 +724,7 @@ body {
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            margin-bottom: 5rem;
         }
 
         .board-faculty-title {
@@ -753,6 +744,9 @@ body {
             margin: 50px auto 100px auto;
             max-width: 200rem;
             color: #ffffff;
+            justify-content: center;
+            text-align: justify;
+
         }
 
 /*Board Executive Section*/
@@ -760,6 +754,7 @@ body {
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            margin-bottom: 5rem;
         }
 
         .board-executive-title {
@@ -775,6 +770,8 @@ body {
             margin: 50px auto 100px auto;
             max-width: 200rem;
             color: #ffffff;
+            justify-content: center;
+            text-align: justify;
         }
 
         
@@ -783,21 +780,28 @@ body {
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            margin-bottom: 5rem;
         }
 
         .core-executive-title {
             font-size: 2.5rem;
             font-weight: bold;
             margin-top: 100px;
-            margin-bottom: 30px;
+            margin-bottom: 5rem;
         }
         
         .core-executive-description {
             font-size: 1.5rem;
             line-height: 1.6;
-            margin: 50px auto 100px auto;
             max-width: 200rem;
             color: #ffffff;
+            text-align: center;
+            margin-top: 5rem;
+            margin-bottom: 5rem;
+            justify-content: center;
+            text-align: justify;
+            
+            
         }
 
 /*Board Year-level Representatives Section*/
@@ -805,6 +809,8 @@ body {
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
+            margin-bottom: 5rem;
+
         }
 
         .board-year-level-title {
@@ -820,6 +826,10 @@ body {
             margin: 50px auto 100px auto;
             max-width: 200rem;
             color: #ffffff;
+            margin-bottom: 5rem;
+            justify-content: center;
+            text-align: justify;
+            
         }
 
 /*Board Faculty Grid Layout*/
@@ -830,6 +840,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     align-items: start;
+    margin-bottom: 5rem;
 }
 
 /* Individual Board Faculty Member */
@@ -907,6 +918,8 @@ body {
     margin: 50px auto 100px auto;
     max-width: 200rem;
     color: #ffffff;
+    justify-content: center;
+    text-align: justify;
 }
 
 /* Faculty Container */
@@ -931,6 +944,7 @@ body {
     gap: 30px;
     max-width: 960px; /* Slightly smaller to center the 4 items */
     margin: 0 auto;
+    margin-bottom: 5rem;
 }
 
 /* Individual Faculty Member */
@@ -943,6 +957,7 @@ body {
 
 /* Faculty Image Styling */
 .faculty-image {
+
     width: 180px;
     height: 180px;
     border-radius: 50%;
@@ -970,8 +985,6 @@ body {
     font-size: 0.9rem;
     color: #cccccc;
 }
-
-
 /* News Section */
 .news-section {
     display: grid;
@@ -1842,6 +1855,8 @@ body {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    justify-content: center;
+    text-align: justify;
 }
 
 
@@ -1880,9 +1895,15 @@ body {
 
 .department-head-description {
     font-size: 1.5rem;
-    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 5rem;
     margin-left: 10rem;
     margin-right: 10rem;
+    max-width: 200rem;
+    color: #ffffff;
+    justify-content: center;
+    text-align: justify;
+
 }
 .adviser-name {
     font-size: 1.5rem;
@@ -1898,6 +1919,7 @@ body {
     opacity: 0.8;
     margin: 0;
     text-align: center;
+    margin-bottom: 5rem;
 }
 
 /* Community Grid - Updated for PHP Integration */
@@ -2225,15 +2247,6 @@ body {
 .adviser-section {
     padding: 80px 0;
     background: #f8f9fa;
-}
-
-.adviser-description {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto 50px auto;
-    font-size: 1.1rem;
-    color: #666;
-    line-height: 1.6;
 }
 
 .adviser-profile {
@@ -2918,7 +2931,7 @@ img {
 }
 
 .developer-bottom {
-    height: 40px;
+    height: 80px;
     overflow-x: hidden;
     overflow-y: auto;
     display: flex;

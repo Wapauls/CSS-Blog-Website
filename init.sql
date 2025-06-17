@@ -43,6 +43,9 @@ CREATE TABLE IF NOT EXISTS developers (
     roles TEXT NOT NULL,
     fb_links TEXT NOT NULL,
     github_links TEXT NOT NULL,
+    linkIn_links TEXT NOT NULL,
+    instagram_links TEXT NOT NULL,
+    x_links TEXT NOT NULL,
     image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 

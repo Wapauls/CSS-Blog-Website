@@ -349,6 +349,18 @@ h1 {
     resize: vertical;
 }
 
+.roles-form-group textarea,
+.fb-form-group textarea,
+.git-form-group textarea,
+.linkIn-form-group textarea,
+.instagram-form-group textarea,
+.x-form-group textarea {
+    resize: none;
+    height: auto;
+    min-height: 20px;
+    max-height: 44px;
+}
+
 .form-row {
     display: flex;
     flex-direction: row;

@@ -37,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $roles = trim($_POST['roles'] ?? '');
         $fb_links = trim($_POST['fb_links'] ?? '');
         $github_links = trim($_POST['github_links'] ?? '');
+        $linkIn_links = trim($_POST['linkIn_links'] ?? '');
+        $instagram_links = trim($_POST['instagram_links'] ?? '');
+        $x_links = trim($_POST['x_links'] ?? '');
         $image = null; // Initialize as null instead of empty string
         
         // Handle image upload
@@ -78,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, image = NULL WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, linkIn_links = ?, instagram_links = ?, x_links = ?, image = NULL WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $id);
+                        $stmt->bind_param('ssssssssi', $title, $content, $roles, $fb_links, $github_links, $linkIn_links, $instagram_links, $x_links, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -94,9 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($current_image && file_exists('../uploads/' . $current_image)) {
                         unlink('../uploads/' . $current_image);
                     }
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, image = ? WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, linkIn_links = ?, instagram_links = ?, x_links = ?, image = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $image, $id);
+                        $stmt->bind_param('ssssssssi', $title, $content, $roles, $fb_links, $github_links, $linkIn_links, $instagram_links, $x_links, $image, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -107,9 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } else {
                     // No image change case
-                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, WHERE id = ?');
+                    $stmt = $conn->prepare('UPDATE developers SET title = ?, content = ?, roles = ?, fb_links = ?, github_links = ?, linkIn_links = ?, instagram_links = ?, x_links = ? WHERE id = ?');
                     if ($stmt) {
-                        $stmt->bind_param('sssssi', $title, $content, $roles, $fb_links, $github_links, $id);
+                        $stmt->bind_param('ssssssssi', $title, $content, $roles, $fb_links, $github_links, $linkIn_links, $instagram_links, $x_links, $id);
                         if ($stmt->execute()) {
                             header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
                             exit();
@@ -122,9 +125,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             // Create new entry
-            $stmt = $conn->prepare('INSERT INTO developers (title, content, roles, fb_links, github_links, image) VALUES (?, ?, ?, ?, ?, ?)');
+            $stmt = $conn->prepare('INSERT INTO developers (title, content, roles, fb_links, github_links, linkIn_links, instagram_links, x_links, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
             if ($stmt) {
-                $stmt->bind_param('ssssss', $title, $content, $roles, $fb_links, $github_links, $image);
+                $stmt->bind_param('sssssssss', $title, $content, $roles, $fb_links, $github_links, $linkIn_links, $instagram_links, $x_links, $image);
                 if ($stmt->execute()) {
                     header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
                     exit();
@@ -235,7 +238,16 @@ $current_page = 'developers';
                             </div>
                         </div>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-roles="<?= htmlspecialchars($row['roles']) ?>" data-fb="<?= htmlspecialchars($row['fb_links']) ?>" data-git="<?= htmlspecialchars($row['github_links']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" 
+                                data-title="<?= htmlspecialchars($row['title']) ?>" 
+                                data-content="<?= htmlspecialchars($row['content']) ?>" 
+                                data-roles="<?= htmlspecialchars($row['roles']) ?>" 
+                                data-fb="<?= htmlspecialchars($row['fb_links'] ?? '') ?>" 
+                                data-git="<?= htmlspecialchars($row['github_links'] ?? '') ?>" 
+                                data-linkin="<?= htmlspecialchars($row['linkIn_links'] ?? '') ?>" 
+                                data-instagram="<?= htmlspecialchars($row['instagram_links'] ?? '') ?>" 
+                                data-x="<?= htmlspecialchars($row['x_links'] ?? '') ?>" 
+                                data-image="<?= htmlspecialchars($row['image'] ?? '') ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
@@ -324,8 +336,11 @@ $current_page = 'developers';
                     title: btn.getAttribute('data-title'),
                     content: btn.getAttribute('data-content'),
                     roles: btn.getAttribute('data-roles'),
-                    fb_links: btn.getAttribute('data-fb'),
-                    github_links: btn.getAttribute('data-git'),
+                    fb: btn.getAttribute('data-fb'),
+                    git: btn.getAttribute('data-git'),
+                    linkIn: btn.getAttribute('data-linkin'),
+                    instagram: btn.getAttribute('data-instagram'),
+                    x: btn.getAttribute('data-x'),
                     image: btn.getAttribute('data-image')
                 };
                 openModal('edit', postData);
@@ -385,18 +400,32 @@ $current_page = 'developers';
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="createContent" name="content" placeholder="Write developer role/position here..." required></textarea>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group roles-form-group">
                                 <label for="createRoles"><i class="fas fa-user-tag"></i> Roles</label>
                                 <textarea id="createRoles" name="roles" placeholder="Enter developer roles (one per line)..." required></textarea>
                             </div>
-                            <div class="form-group">
-                                <label for="createFb"><i class="fas fa-code"></i> Facebook link</label>
-                                <textarea id="createFb" name="fb_links" placeholder="Enter developer facebook link" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="createGit"><i class="fas fa-code"></i> Github link</label>
-                                <textarea id="createGit" name="github_links" placeholder="Enter developer github link" required></textarea>
-                            </div>
+<div class="form-group fb-form-group">
+    <label for="createFb">Facebook link</label>
+    <input type="url" id="createFb" name="fb_links" placeholder="Enter developer Facebook link" >
+</div>
+
+<div class="form-group git-form-group">
+    <label for="createGit">GitHub link</label>
+    <input type="url" id="createGit" name="github_links" placeholder="Enter developer GitHub link" >
+</div>
+<div class="form-group linkIn-form-group">
+    <label for="createlinkIn">Facebook link</label>
+    <input type="url" id="createLinkIn" name="linkIn_links" placeholder="Enter developer LinkIn link" >
+</div>
+
+<div class="form-group instagram-form-group">
+    <label for="createInstagram">Instagram link</label>
+    <input type="url" id="createInstagram" name="instagram_links" placeholder="Enter developer Instagram link" >
+</div>
+<div class="form-group x-form-group">
+    <label for="createX">X link</label>
+    <input type="url" id="createGit" name="x_links" placeholder="Enter developer X link" >
+</div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
                                 <label class="file-input-label" for="createImage">
@@ -418,7 +447,7 @@ $current_page = 'developers';
                     <div class="modal-content">
                         <button type="button" class="close-modal">&times;</button>
                         <h2><i class="fas fa-edit"></i> Edit Developer</h2>
-                        <form id="editPostForm" method="POST" enctype="multipart/form-data">
+                        <form id="editPostForm" method="POST" enctype="multipart/form-data" action="<?= $_SERVER['PHP_SELF'] ?>">
                             <input type="hidden" name="id" value="${data.id}">
                             <input type="hidden" name="remove_image" value="false" id="removeImageFlag">
                             <div class="form-group">
@@ -434,12 +463,24 @@ $current_page = 'developers';
                                 <textarea id="editRoles" name="roles" required>${data.roles}</textarea>
                             </div>
                             <div class="form-group">
-                                <label for="editFb"><i class="fas fa-code"></i> Facebook link</label>
-                                <textarea id="editFb" name="fb_links" required>${data.fb}</textarea>
+                                <label for="editFb">Facebook Link</label>
+                                <input type="url" id="editFb" name="fb_links" value="${data.fb || ''}" placeholder="Add Facebook link">
                             </div>
-                                                        <div class="form-group">
-                                <label for="editGit"><i class="fas fa-code"></i> Github link</label>
-                                <textarea id="editGit" name="github_links" required>${data.git}</textarea>
+                            <div class="form-group">
+                                <label for="editGit">GitHub Link</label>
+                                <input type="url" id="editGit" name="github_links" value="${data.git || ''}" placeholder="Add GitHub link">
+                            </div>
+                            <div class="form-group">
+                                <label for="editLinkIn">LinkedIn Link</label>
+                                <input type="url" id="editLinkIn" name="linkIn_links" value="${data.linkIn || ''}" placeholder="Add LinkedIn link">
+                            </div>
+                            <div class="form-group">
+                                <label for="editInstagram">Instagram Link</label>
+                                <input type="url" id="editInstagram" name="instagram_links" value="${data.instagram || ''}" placeholder="Add Instagram link">
+                            </div>
+                            <div class="form-group">
+                                <label for="editX">X (Twitter) Link</label>
+                                <input type="url" id="editX" name="x_links" value="${data.x || ''}" placeholder="Add X (Twitter) link">
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Profile Image</label>
