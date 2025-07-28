@@ -167,6 +167,25 @@ $current_page = 'about';
     <title>Admin - About</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+.main-content {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: #4ee6f2 #181c20;
+}
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+.main-content::-webkit-scrollbar-thumb {
+    background: #4ee6f2;
+    border-radius: 4px;
+}
+.main-content::-webkit-scrollbar-track {
+    background: #181c20;
+    border-radius: 4px;
+}
+</style>
 </head>
 <body>
     <?php include 'includes/sidebar.php'; ?>
@@ -182,7 +201,104 @@ $current_page = 'about';
         <button class="stat-link" id="openCreateModal">
             <i class="fas fa-plus"></i> Create New About Entry
         </button>
+
+        <button class="stat-link" id="openDeveloperModal">
+            <i class="fas fa-user-plus"></i> Add New Developer
+        </button>
         
+        <div class="all-posts-container" id="allPostsContainer">
+            <?php if ($entries->num_rows > 0): ?>
+                <?php while ($row = $entries->fetch_assoc()): ?>
+                    <div class="post-row" data-post-id="<?= $row['id'] ?>">
+                        <?php if ($row['image']): ?>
+                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['title']) ?>">
+                        <?php else: ?>
+                            <div class="no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        <?php endif; ?>
+                        <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
+                        <span class="post-category"><?= htmlspecialchars($row['category']) ?></span>
+                        <?php
+                        $content = strip_tags($row['content']);
+                        $truncated = mb_substr($content, 0, 105);
+                        if (mb_strlen($content) > 105) {
+                            $truncated .= '...';
+                        }
+                        ?>
+                        <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
+                        <div class="post-actions">
+                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="no-posts">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No about entries found. Start by creating your first entry!</p>
+                    <button class="stat-link" id="openCreateModalEmpty">
+                        <i class="fas fa-plus"></i> Create Your First Entry
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+            <!-- Developer Management Section -->
+            <div class="section-divider">
+            <h2>Developer Team Management</h2>
+            <p>Manage the developer team that appears on the About page. Drag and drop to reorder.</p>
+        </div>
+
+        <div class="developers-container" id="developersContainer">
+            <?php if ($developer_entries->num_rows > 0): ?>
+                <div class="developers-list" id="developersList">
+                    <?php while ($row = $developer_entries->fetch_assoc()): ?>
+                        <div class="developer-item" data-id="<?= $row['id'] ?>" data-order="<?= $row['display_order'] ?>">
+                            <div class="drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <?php if ($row['image']): ?>
+                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
+                            <?php else: ?>
+                                <div class="no-image">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            <?php endif; ?>
+                            <div class="developer-info">
+                                <span class="developer-name"><?= htmlspecialchars($row['name']) ?></span>
+                                <span class="developer-position"><?= htmlspecialchars($row['position']) ?></span>
+                            </div>
+                            <div class="developer-actions">
+                                <button class="edit-developer-btn" data-id="<?= $row['id'] ?>" 
+                                    data-name="<?= htmlspecialchars($row['name']) ?>" 
+                                    data-position="<?= htmlspecialchars($row['position']) ?>" 
+                                    data-image="<?= htmlspecialchars($row['image'] ?? '') ?>">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-developer-btn" data-id="<?= $row['id'] ?>" data-name="<?= htmlspecialchars($row['name']) ?>">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            <?php else: ?>
+                <div class="no-developers">
+                    <i class="fas fa-users"></i>
+                    <p>No developers added yet. Start by adding your first team member!</p>
+                    <button class="stat-link" id="openDeveloperModalEmpty">
+                        <i class="fas fa-user-plus"></i> Add Your First Developer
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+<<<<<<< HEAD
         <div class="all-posts-container" id="allPostsContainer">
             <?php if ($entries->num_rows > 0): ?>
                 <?php while ($row = $entries->fetch_assoc()): ?>
@@ -223,6 +339,154 @@ $current_page = 'about';
                 </div>
             <?php endif; ?>
         </div>
+=======
+        <!-- Content Order Management Section -->
+        <div class="section-divider">
+            <h2>Content Order Management</h2>
+            <p>Drag and drop to reorder how content appears on the About page. Posts and Developer sections can be mixed.</p>
+        </div>
+        
+        <div class="content-order-container" id="contentOrderContainer">
+            <?php
+            // Get current content order
+            $content_order = $conn->query('SELECT * FROM about_content_order ORDER BY display_order ASC');
+            $ordered_items = [];
+
+            if ($content_order && $content_order->num_rows > 0) {
+                while ($order_row = $content_order->fetch_assoc()) {
+                    if ($order_row['content_type'] === 'post') {
+                        $post_id = intval($order_row['content_id']);
+                        $post_query = $conn->prepare('SELECT * FROM about WHERE id = ?');
+                        if ($post_query) {
+                            $post_query->bind_param('i', $post_id);
+                            $post_query->execute();
+                            $post_result = $post_query->get_result();
+                            if ($post_result->num_rows > 0) {
+                                $ordered_items[] = [
+                                    'type' => 'post',
+                                    'id' => $order_row['content_id'],
+                                    'data' => $post_result->fetch_assoc()
+                                ];
+                            }
+                            $post_query->close();
+                        }
+                    } elseif ($order_row['content_type'] === 'developers') {
+                        $ordered_items[] = [
+                            'type' => 'developers',
+                            'id' => 'developers',
+                            'data' => ['title' => 'Developer Team Section']
+                        ];
+                    }
+                }
+            }
+            
+            if (!empty($ordered_items)):
+            ?>
+            <div class="content-order-list" id="contentOrderList">
+                <?php foreach ($ordered_items as $item): ?>
+                    <div class="content-order-item" data-type="<?= $item['type'] ?>" data-id="<?= $item['id'] ?>" draggable="true">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="content-info">
+                            <?php if ($item['type'] === 'post'): ?>
+                                <?php $img = $item['data']['image'] ?? null; ?>
+                                <?php if ($img): ?>
+                                    <img src="../uploads/<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['data']['title']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
+                                <?php endif; ?>
+                                <span class="content-type">Post</span>
+                                <span class="content-title"><?= htmlspecialchars($item['data']['title']) ?></span>
+                            <?php else: ?>
+                                <img src="../assets/images/code.png" alt="Developers" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
+                                <span class="content-type">Developer Section</span>
+                                <span class="content-title"><?= htmlspecialchars($item['data']['title']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="content-actions">
+                            <button class="remove-content-btn" data-type="<?= $item['type'] ?>" data-id="<?= $item['id'] ?>">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+            <div class="no-content-order">
+                <i class="fas fa-info-circle"></i>
+                <p>No content order set. Add posts and developers to create the page layout.</p>
+            </div>
+            <?php endif; ?>
+        </div>
+        
+        <!-- Available Content Section -->
+        <div class="section-divider">
+            <h2>Available Content</h2>
+            <p>Add content to the About page layout.</p>
+        </div>
+        
+        <!-- Available Posts -->
+        <div class="available-content-section">
+            <h3>Available Posts</h3>
+            <div class="available-posts">
+                <?php
+                $all_posts = $conn->query('SELECT * FROM about ORDER BY created_at DESC');
+                if ($all_posts && $all_posts->num_rows > 0):
+                    while ($post = $all_posts->fetch_assoc()):
+                        // Check if post is already in order
+                        $in_order = $conn->prepare('SELECT id FROM about_content_order WHERE content_type = "post" AND content_id = ?');
+                        $in_order->bind_param('i', $post['id']);
+                        $in_order->execute();
+                        $in_order_result = $in_order->get_result();
+                        $is_ordered = $in_order_result->num_rows > 0;
+                        $in_order->close();
+                        
+                        if (!$is_ordered):
+                ?>
+                <div class="available-item" data-type="post" data-id="<?= $post['id'] ?>">
+                    <div class="item-info">
+                        <span class="item-title"><?= htmlspecialchars($post['title']) ?></span>
+                        <span class="item-category"><?= htmlspecialchars($post['category']) ?></span>
+                    </div>
+                    <button class="add-content-btn" data-type="post" data-id="<?= $post['id'] ?>" data-title="<?= htmlspecialchars($post['title']) ?>">
+                        <i class="fas fa-plus"></i> Add to Layout
+                    </button>
+                </div>
+                <?php 
+                        endif;
+                    endwhile;
+                endif;
+                ?>
+            </div>
+        </div>
+        
+        <!-- Available Developer Section -->
+        <div class="available-content-section">
+            <h3>Developer Section</h3>
+            <div class="available-developers">
+                <?php
+                $dev_in_order = $conn->prepare('SELECT id FROM about_content_order WHERE content_type = "developers"');
+                $dev_in_order->execute();
+                $dev_in_order_result = $dev_in_order->get_result();
+                $dev_is_ordered = $dev_in_order_result->num_rows > 0;
+                $dev_in_order->close();
+                
+                if (!$dev_is_ordered):
+                ?>
+                <div class="available-item" data-type="developers" data-id="developers">
+                    <div class="item-info">
+                        <span class="item-title">Developer Team Section</span>
+                        <span class="item-category">Team Members</span>
+                    </div>
+                    <button class="add-content-btn" data-type="developers" data-id="developers" data-title="Developer Team Section">
+                        <i class="fas fa-plus"></i> Add to Layout
+                    </button>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+
+>>>>>>> e8b178e (JULY 28 UPDATE)
         
         <!-- Modal Container -->
         <div id="blogModalContainer"></div>

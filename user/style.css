@@ -589,14 +589,57 @@ object-fit: cover;
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
-.about-entry img {
-    width: 100%;
-    max-height: 400px;
+.about-entry img,
+.about-developer-image {
+    width: 120px;
+    height: 120px;
     object-fit: cover;
-    border-radius: 5px;
-    margin: 1rem 0;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    background: #222;
+    border: 3px solid #40E0D0;
+}
+
+.about-developer-info {
+    text-align: center;
+}
+
+.about-developer-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(78, 230, 242, 0.3);
+}
+
+.about-developer-position {
+    color: #b8eaff;
+    font-size: 1rem;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+.about-developer-image-placeholder {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    border-radius: 50%;
+    border: 3px solid #40E0D0;
+    margin-bottom: 1rem;
+}
+
+.about-developer-image-placeholder i {
+    font-size: 2.5rem;
+    color: #4ee6f2;
 }
 
 /* Community Section */
@@ -2610,19 +2653,62 @@ img {
 }
 
 .about-entry {
-    background: #fff;
+    background: #2e2e2e;
     border-radius: 10px;
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
-.about-entry img {
-    width: 100%;
-    max-height: 400px;
+.about-entry img,
+.about-developer-image {
+    width: 120px;
+    height: 120px;
     object-fit: cover;
-    border-radius: 5px;
-    margin: 1rem 0;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    background: #222;
+    border: 3px solid #40E0D0;
+}
+
+.about-developer-info {
+    text-align: center;
+}
+
+.about-developer-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(78, 230, 242, 0.3);
+}
+
+.about-developer-position {
+    color: #b8eaff;
+    font-size: 1rem;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+.about-developer-image-placeholder {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    border-radius: 50%;
+    border: 3px solid #40E0D0;
+    margin-bottom: 1rem;
+}
+
+.about-developer-image-placeholder i {
+    font-size: 2.5rem;
+    color: #4ee6f2;
 }
 
 /* Community Section */

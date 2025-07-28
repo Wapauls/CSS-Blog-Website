@@ -177,6 +177,7 @@ switch($current_page) {
         </div>
         
         <?php elseif ($current_page === 'about'): ?>
+<<<<<<< HEAD
             <h1>About Us</h1>
             <div class="about-section">
                 <?php if ($about_entries && $about_entries->num_rows > 0): ?>
@@ -259,6 +260,101 @@ switch($current_page) {
                     <img src="../assets/images/bscslogo.png" alt="Ms. Maireen Baltazar" class="faculty-image">
                     <h3 class="faculty-name">Ms. Maireen Baltazar</h3>
                     <p class="faculty-position">BSCS Faculty</p>
+=======
+            <section class="container">
+                <h2 class="section-title">About <span>Us</span></h2>
+                <div class="about-content-container">
+                    <?php
+                    // Get all content in order (posts and developers mixed)
+                    $content_order = $conn->query('SELECT * FROM about_content_order ORDER BY display_order ASC');
+                    $ordered_content = [];
+                    
+                    if ($content_order && $content_order->num_rows > 0) {
+                        while ($order_row = $content_order->fetch_assoc()) {
+                            if ($order_row['content_type'] === 'post') {
+                                $post_query = $conn->prepare('SELECT * FROM about WHERE id = ?');
+                                $post_query->bind_param('i', $order_row['content_id']);
+                                $post_query->execute();
+                                $post_result = $post_query->get_result();
+                                if ($post_result->num_rows > 0) {
+                                    $ordered_content[] = [
+                                        'type' => 'post',
+                                        'data' => $post_result->fetch_assoc()
+                                    ];
+                                }
+                                $post_query->close();
+                            } elseif ($order_row['content_type'] === 'developers') {
+                                $dev_query = $conn->query('SELECT * FROM about_developers ORDER BY display_order ASC, created_at DESC');
+                                if ($dev_query && $dev_query->num_rows > 0) {
+                                    $ordered_content[] = [
+                                        'type' => 'developers',
+                                        'data' => $dev_query->fetch_all(MYSQLI_ASSOC)
+                                    ];
+                                }
+                            }
+                        }
+                    } else {
+                        // Fallback: show posts first, then developers
+                        if ($about_entries && $about_entries->num_rows > 0) {
+                            while ($row = $about_entries->fetch_assoc()) {
+                                $ordered_content[] = [
+                                    'type' => 'post',
+                                    'data' => $row
+                                ];
+                            }
+                        }
+                        
+                        $about_developers = $conn->query('SELECT * FROM about_developers ORDER BY display_order ASC, created_at DESC');
+                        if ($about_developers && $about_developers->num_rows > 0) {
+                            $ordered_content[] = [
+                                'type' => 'developers',
+                                'data' => $about_developers->fetch_all(MYSQLI_ASSOC)
+                            ];
+                        }
+                    }
+                    
+                    // Display content in order
+                    foreach ($ordered_content as $content) {
+                        if ($content['type'] === 'post') {
+                            $row = $content['data'];
+                            ?>
+                            <article class="about-entry">
+                                <h2><?= htmlspecialchars($row['title']) ?></h2>
+                                <?php if ($row['image']): ?>
+                                    <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                                <?php endif; ?>
+                                <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
+                                <?php if (!empty($row['category'])): ?>
+                                    <div class="post-category">Category: <?= htmlspecialchars($row['category']) ?></div>
+                                <?php endif; ?>
+                                <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
+                            </article>
+                            <?php
+                        } elseif ($content['type'] === 'developers') {
+                            $developers = $content['data'];
+                            foreach ($developers as $dev): ?>
+                                <article class="about-entry">
+                                    <?php if ($dev['image']): ?>
+                                        <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
+                                    <?php else: ?>
+                                        <div class="about-developer-image-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="about-developer-info">
+                                        <h3 class="about-developer-name"><?= htmlspecialchars($dev['name']) ?></h3>
+                                        <p class="about-developer-position"><?= htmlspecialchars($dev['position']) ?></p>
+                                    </div>
+                                </article>
+                            <?php endforeach;
+                        }
+                    }
+                    
+                    if (empty($ordered_content)) {
+                        echo '<p class="no-content">About content coming soon.</p>';
+                    }
+                    ?>
+>>>>>>> e8b178e (JULY 28 UPDATE)
                 </div>
 
                 <div class="faculty-member">
