@@ -32,36 +32,37 @@ switch($current_page) {
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.php" class="logo">
-                <img src="../assets/images/logo.png" />
-            </a>
-            <div class="nav-links">
-                <a href="?page=home" class="<?= $current_page === 'home' ? 'active' : '' ?>">
-                    <i class="fas fa-home"></i> Home
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.php" class="logo">
+                    <img src="../assets/images/logo.png" />
                 </a>
-                <a href="?page=about" class="<?= $current_page === 'about' ? 'active' : '' ?>">
-                    <i class="fas fa-info-circle"></i> About
-                </a>
-                <a href="?page=community" class="<?= $current_page === 'community' ? 'active' : '' ?>">
-                    <i class="fas fa-users"></i> Community
-                </a>
-                <a href="?page=news" class="<?= $current_page === 'news' ? 'active' : '' ?>">
-                    <i class="fas fa-newspaper"></i> News and Events
-                </a>
-                <a href="?page=developers" class="<?= $current_page === 'developers' ? 'active' : '' ?>">
-                    <i class="fas fa-code"></i> Developers
-                </a>
+                <div class="nav-links">
+                    <a href="?page=home" class="<?= $current_page === 'home' ? 'active' : '' ?>">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <a href="?page=about" class="<?= $current_page === 'about' ? 'active' : '' ?>">
+                        <i class="fas fa-info-circle"></i> About
+                    </a>
+                    <a href="?page=community" class="<?= $current_page === 'community' ? 'active' : '' ?>">
+                        <i class="fas fa-users"></i> Community
+                    </a>
+                    <a href="?page=news" class="<?= $current_page === 'news' ? 'active' : '' ?>">
+                        <i class="fas fa-newspaper"></i> News and Events
+                    </a>
+                    <a href="?page=developers" class="<?= $current_page === 'developers' ? 'active' : '' ?>">
+                        <i class="fas fa-code"></i> Developers
+                    </a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <!-- Main Content -->
+    <main>
     <?php if ($current_page === 'home'): ?>
         <!-- Hero Section -->
         <section class="hero">
@@ -156,111 +157,27 @@ switch($current_page) {
         </section>
 
         <!-- Blog Posts Section -->
-        <div class="container">
+        <section class="container">
             <h2 class="section-title">Latest <span>Blog Posts</span></h2>
             <div class="posts">
                 <?php if ($posts && $posts->num_rows > 0): ?>
                     <?php while ($row = $posts->fetch_assoc()): ?>
-                        <div class="post">
+                        <article class="post">
                             <h2><?= htmlspecialchars($row['title']) ?></h2>
                             <?php if ($row['image']): ?>
                                 <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
                             <?php endif; ?>
                             <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                             <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
-                        </div>
+                        </article>
                     <?php endwhile; ?>
                 <?php else: ?>
                     <p class="no-content">No posts available yet.</p>
                 <?php endif; ?>
             </div>
-        </div>
+        </section>
         
         <?php elseif ($current_page === 'about'): ?>
-<<<<<<< HEAD
-            <h1>About Us</h1>
-            <div class="about-section">
-                <?php if ($about_entries && $about_entries->num_rows > 0): ?>
-                    <?php while ($row = $about_entries->fetch_assoc()): ?>
-                        <div class="about-entry">
-                            <h2><?= htmlspecialchars($row['title']) ?></h2>
-                            <?php if ($row['image']): ?>
-                                <img src="../assets/images/<?= htmlspecialchars($row['image']) ?>" alt="">
-                            <?php endif; ?>
-                            <div class="content">
-                                <?= nl2br(htmlspecialchars($row['content'])) ?>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p class="no-content">About content coming soon.</p>
-                <?php endif; ?>
-            </div>
-
-<!-- Community Section -->
-
-
-
-    <?php elseif ($current_page === 'community'): ?>
- 
-<section class="commu-sect">
-    <div class="community-container">
-        <h1 class="Community">
-            NextGen <span class="highlight-community">CSS</span>
-        </h1>
-        
-        <img src="../assets/images/css-campaign.png" alt="Campaign" class="campaign-picture">
-        
-        <p class="Community-description">
-            We, the Computer Science Society (CSS) community, are committed to building a progressive and inclusive society.<br><br>
-            Rooted in innovation and driven by purpose, we aim to empower Clarean students to lead with integrity, collaborate with intention, and thrive in the evolving world of Information and Computing Sciences.<br><br>
-            Through the Progressive CSS Campaign, we foster a culture of excellence, growth, and shared knowledge.<br><br>
-            We envision a future where every member is equipped, inspired, and united in shaping meaningful change through technology.
-        </p>
-    </div> 
-</section>
-
-
-<section class="soc-sect">
-     <div class="cs-society-section">
-        <h1 class="cs-society-title">
-            Clarean CS Society: <br> 
-            <span class="highlight">Code. Connect. Create.</span>
-        </h1>
-        
-        <p class="cs-society-description">
-            The Clarean CS Society is a student-led organization dedicated to cultivating excellence in information and Computing Sciences through coding collaboration and innovation. 
-            <br>
-            We code with passion, connect as a united community and create a future driven by technology empowering Clarean students to lead in a rapidly evolving digital world.
-        </p>
-        
-        <img src="../assets/images/hartsdeh.jpg" alt="CS Society" class="cs-image">
-    </div>
-</section>
-
-
-<section class="dept-sect">
-    <div class="department-section">
-        <div class="department-head-container">
-            <h1 class="department-head-title"> The <span class="highlight">Department Head and Adviser<br><br></span></h1>
-                <p class="department-head-description"> Our dedicated adviser after invaluable experience and insight, providing strategic guidance and mentorship to support our members in achieving both academic excellence and professional growth.<br><br></p>   
-                    <img src="../assets/images/bscslogo.png" class="adviser-image" alt="adviser-image"> <!--Placeholder Only -->   
-                        <h2 class="adviser-name"> Ms. Jeanethjoy D. Naturales </h2>
-                            <p class="adviser-position">Department Head and Adviser </p>
-        </div>
-    </div>
-
-    <div class="board-faculty-section">
-        <h1 class="board-faculty-title"> The <span class="highlight"> Board of Academic Faculty </h1> 
-            <p class="board-faculty-description"> The Board of Academic Faculty is composed of esteemed educators and subject matter experts who contribute to the intellectual foundation of the society. They provide academic guidance, uphold scholarly standards, and support the holistic development of students within the field of Information and Computing Sciences. </p>
-                    <div class="faculty-container">
-
-            <div class="faculty-grid"> <!--First Row-->
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Ms. Maireen Baltazar" class="faculty-image">
-                    <h3 class="faculty-name">Ms. Maireen Baltazar</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-=======
             <section class="container">
                 <h2 class="section-title">About <span>Us</span></h2>
                 <div class="about-content-container">
@@ -334,17 +251,17 @@ switch($current_page) {
                             $developers = $content['data'];
                             foreach ($developers as $dev): ?>
                                 <article class="about-entry">
-                                    <?php if ($dev['image']): ?>
-                                        <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
-                                    <?php else: ?>
-                                        <div class="about-developer-image-placeholder">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                    <?php endif; ?>
-                                    <div class="about-developer-info">
-                                        <h3 class="about-developer-name"><?= htmlspecialchars($dev['name']) ?></h3>
-                                        <p class="about-developer-position"><?= htmlspecialchars($dev['position']) ?></p>
-                                    </div>
+                                            <?php if ($dev['image']): ?>
+                                                <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
+                                            <?php else: ?>
+                                                <div class="about-developer-image-placeholder">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            <?php endif; ?>
+                                            <div class="about-developer-info">
+                                                <h3 class="about-developer-name"><?= htmlspecialchars($dev['name']) ?></h3>
+                                                <p class="about-developer-position"><?= htmlspecialchars($dev['position']) ?></p>
+                                            </div>
                                 </article>
                             <?php endforeach;
                         }
@@ -354,281 +271,71 @@ switch($current_page) {
                         echo '<p class="no-content">About content coming soon.</p>';
                     }
                     ?>
->>>>>>> e8b178e (JULY 28 UPDATE)
                 </div>
+            </section>
 
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Ms. May Ann Maniego" class="faculty-image">
-                    <h3 class="faculty-name">Ms. May Ann Maniego</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Enrico Columna" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Enrico Columna</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Alvin Gallo" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Alvin Gallo</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-            </div>
-
-            <div class="faculty-grid"> <!--Second Row-->
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Hobel Dioquino" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Hobel Dioquino</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Julius Abendano" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Julius Abendano</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Erwin Guerra" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Erwin Guerra</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="Mr. Rafaelito Quimora" class="faculty-image">
-                    <h3 class="faculty-name">Mr. Rafaelito Quimora</h3>
-                    <p class="faculty-position">BSCS Faculty</p>
-                </div>
-            </div>
-</section>
-
-<!-- Board of Executive Section -->
-
-<section class="executive-sect">
-    <div class="board-executive-section">
-    <h1 class="board-executive-title">The
-        <span class="highlight">Board of Executive</span>
-    </h1>
-    <p class="board-executive-description">
-        The Executive Board comprises committed and experienced leaders who provide strategic direction to the society, driving its mission and fostering excellence in the field of information and Computing Sciences. </p>
-        <div class="board-executive-container">
-        <div class="executive-faculty-grid"> <!--First Row-->
-                <div class="pres-Kyle">
-                    <img src="../assets/images/Pres.Kyle.jpg" alt="Kyle-jpg" class="faculty-image">
-                    <h3 class="faculty-name">Kyle Vincent Z. Pasuquin</h3>
-                    <p class="faculty-position">Departmental President</p>
-                </div>
-
-                <div class="VP-internal">
-                    <img src="../assets/images/VP internal.Jake.jpg" alt="Russel-jpg" class="faculty-image">
-                    <h3 class="faculty-name">Jake Russel Belen</h3>
-                    <p class="faculty-position">Vice-President Internal</p>
-                </div>
-
-                <div class="VP-external">
-                    <img src="../assets/images/VP ecternal.raine.jpg" alt="Raine-jpg" class="faculty-image">
-                    <h3 class="faculty-name">Raine E.Esparrago</h3>
-                    <p class="faculty-position">Vice-President External</p>
-                </div>
-
-            </div>
-
-            <div class="executive-grid"> <!--Second Row-->
-
-                <div class="dept-secretary">
-                    <img src="../assets/images/secretary.clarisse.jpg" alt="Clariss-jpg" class="faculty-image">
-                    <h3 class="faculty-name">Clariss Mae D. Selisana</h3>
-                    <p class="faculty-position">Departmental Secretary</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/treasurer.shen.jpg" alt="Shenmar Bonifacio" class="faculty-image">
-                    <h3 class="faculty-name">Shenmar Bonifacio</h3>
-                    <p class="faculty-position">Departmental Treasurer</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/audtior.balili.jpg" alt="Jahn Florence Balili" class="faculty-image">
-                    <h3 class="faculty-name">Jahn Florence Balili</h3>
-                    <p class="faculty-position">Departmental Auditor</p>
-                </div>
+<?php elseif ($current_page === 'community'): ?>
+    <section class="container">
+        <h2 class="section-title">Our <span>Community</span></h2>
+        <div class="posts">
+            <?php if ($community_entries && $community_entries->num_rows > 0): ?>
+                <?php while ($row = $community_entries->fetch_assoc()): ?>
+                    <article class="post">
+                        <h2><?= htmlspecialchars($row['title']) ?></h2>
+                        <?php if ($row['image']): ?>
+                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                        <?php endif; ?>
+                        <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
+                        <?php if (!empty($row['category'])): ?>
+                            <div class="post-category">Category: <?= htmlspecialchars($row['category']) ?></div>
+                        <?php endif; ?>
+                        <?php if (!empty($row['event_date'])): ?>
+                            <div class="post-event-date">Event Date: <?= date('F j, Y', strtotime($row['event_date'])) ?></div>
+                        <?php endif; ?>
+                        <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
+                    </article>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p class="no-content">Community content coming soon.</p>
+            <?php endif; ?>
         </div>
-    </div>
-</section>
-    <!--Core Executive Section -->
-<section class="core-sect">
-<div class="core-executive-section">
-    <h1 class="core-executive-title">The <span class="highlight">Core Executive</span></h1>
+    </section>
+
+<?php elseif ($current_page === 'news'): ?>
+    <section class="container">
+        <h2 class="section-title">News and <span>Events</span></h2>
+        <div class="posts">
+            <?php if ($news_entries && $news_entries->num_rows > 0): ?>
+                <?php while ($row = $news_entries->fetch_assoc()): ?>
+                    <article class="post">
+                        <h2><?= htmlspecialchars($row['title']) ?></h2>
+                        <?php if ($row['image']): ?>
+                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                        <?php endif; ?>
+                        <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
+                        <?php if (!empty($row['category'])): ?>
+                            <div class="post-category">Category: <?= htmlspecialchars($row['category']) ?></div>
+                        <?php endif; ?>
+                        <?php if (!empty($row['event_date'])): ?>
+                            <div class="post-event-date">Event Date: <?= date('F j, Y', strtotime($row['event_date'])) ?></div>
+                        <?php endif; ?>
+                        <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
+                    </article>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p class="no-content">News and Events content coming soon.</p>
+            <?php endif; ?>
+        </div>
+    </section>
+
     
 
-    <div class="core-executive-container">
-            <p class="core-executive-description">The Core Executive Board is composed of dedicated and capable leaders who play a vital role in shaping the vision of the society, providing strategic leadership, and advancing excellence in the field of Information and Computing Sciences.</p> </div>
-
-        <div class="faculty-member-grid">
-                <div class="faculty-member">
-                    <img src="../assets/images/core.shane.jpg" alt="Shane Xander C. Samonte" class="faculty-image">
-                    <h3 class="faculty-name">Shane Xander C. Samonte</h3>
-                    <p class="faculty-position">Core Officer</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/core.abby.jpg" alt="Marie Bernadette V. Agustin" class="faculty-image">
-                    <h3 class="faculty-name">Marie Bernadette V. Agustin</h3>
-                    <p class="faculty-position">Core Officer</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/core.jam.jpg" alt="Jamaica C. Magtoto" class="faculty-image">
-                    <h3 class="faculty-name">Jamaica C. Magtoto</h3>
-                    <p class="faculty-position">Core Officer</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/core.jhonas.jpg" alt="Jhonas Angelo A. Cañotal" class="faculty-image">
-                    <h3 class="faculty-name">Jhonas Angelo A. Cañotal</h3>
-                    <p class="faculty-position">Core Officer</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/core.jayz.jpg" alt="Jay-z Nicolo Reyes" class="faculty-image">
-                    <h3 class="faculty-name">Jay-z Nicolo Reyes</h3>
-                    <p class="faculty-position">Core Officer</p>
-                </div>
-            
-        </div>
-    </div>
-</div>
-</section>
-<!-- Board of Year-level Representatives Section -->
-
-<section class="board-yr-level-sect">
-
-<div class="board-year-level-section">
-    <h1 class="board-year-level-title">The
-        <span class="highlight">Board of Year-level Representatives</span>
-    </h1>
-        
-        <div class="board-year-level-container">
-            <p class="board-year-level-description">The Board of Year-Level Representatives is composed of student leaders from each academic level who serve as the voice of their peers, fostering active engagement, promoting inclusivity, and supporting the society's mission within the field of Information and Computing Sciences.</p>
-        </div>
-
-    <div class="faculty-grid">
-                <div class="faculty-member">
-                    <img src="../assets/images/4thyr rep.leofred.jpg" alt="Leofred Nuñez" class="faculty-image">
-                    <h3 class="faculty-name">Leofred Nuñez</h3>
-                    <p class="faculty-position">4th Year Level Representative</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/3rdyr rep.maye.jpg" alt="Marielle Nicole G. Silvestre" class="faculty-image">
-                    <h3 class="faculty-name">Marielle Nicole G. Silvestre</h3>
-                    <p class="faculty-position">3rd Year Level Representative</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/2ndyr rep.felicity.jpg" alt="Felicity Marie Santos" class="faculty-image">
-                    <h3 class="faculty-name">Felicity Marie Santos</h3>
-                    <p class="faculty-position">2nd Year Level Representative</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/1st yr rep.leigh.jpg" alt="Jaylah Leigh M. Biasa" class="faculty-image">
-                    <h3 class="faculty-name">Jaylah Leigh M. Biasa</h3>
-                    <p class="faculty-position">1st Year Level Representative</p>
-                </div>
-        </div>
-    </div>
-</div>
-
-</section>
-    
-
-
-
-<!-- Commitee Board Section -->
-
-<div class="committee-board-section">
-    <div class="faculty-member-section">
-        <h1 class="board-faculty-title">The
-            <span class="highlight">Operations & Committees Board</span>
-        </h1>
-        
-        <p class="board-faculty-description">
-        The Operations & Committees Board is composed of committee chairs and functional officers who lead the society's core initiatives and activities. Through their specialized roles, they ensure the effective implementation of programs, promote collaboration, and uphold the society's commitment to excellence in the field of Information and Computing Sciences.
-        </p>
-    </div>
-
-        <div class="faculty-container">
-            <!-- First Row: 5 Members -->
-            <div class="faculty-member-grid">
-                <div class="faculty-member">
-                    <img src="../assets/images/membership.benedict.jpg" alt="Benedict Bryan Montances" class="faculty-image">
-                    <h3 class="faculty-name">Benedict Bryan Montances</h3>
-                    <p class="faculty-position">Membership Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/business.wapol.jpg" alt="John Paul Galano" class="faculty-image">
-                    <h3 class="faculty-name">John Paul Galano</h3>
-                    <p class="faculty-position">Business Manager/Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/acad.juliana.jpg" alt="Juliana L. Baguio" class="faculty-image">
-                    <h3 class="faculty-name">Juliana L. Baguio</h3>
-                    <p class="faculty-position">Academic Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/ict.seth.jpg" alt="Seth Brisenio" class="faculty-image">
-                    <h3 class="faculty-name">Seth Brisenio</h3>
-                    <p class="faculty-position">ICT Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/research.cleave.jpg" alt="Cleave Cole B. Fresto" class="faculty-image">
-                    <h3 class="faculty-name">Cleave Cole B. Fresto</h3>
-                    <p class="faculty-position">Research Committee Chair</p>
-                </div>
-            </div>
-
-            <!-- Second Row: 4 Members -->
-            <div class="faculty-member-grid-row2">
-                <div class="faculty-member">
-                    <img src="../assets/images/bscslogo.png" alt="John Benny B. Socorro" class="faculty-image">
-                    <h3 class="faculty-name">John Benny B. Socorro</h3>
-                    <p class="faculty-position">Sports Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/event.elaiza.jpg" alt="Elaiza Lujibilla G. Fulgencio" class="faculty-image">
-                    <h3 class="faculty-name">Elaiza Lujibilla G. Fulgencio</h3>
-                    <p class="faculty-position">Events Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/cc.ember.jpg" alt="Denver Masangcay" class="faculty-image">
-                    <h3 class="faculty-name">Denver Masangcay</h3>
-                    <p class="faculty-position">Community Committee Chair</p>
-                </div>
-
-                <div class="faculty-member">
-                    <img src="../assets/images/environment.cali.jpg" alt="Princess Calimoso" class="faculty-image">
-                    <h3 class="faculty-name">Princess Calimoso</h3>
-                    <p class="faculty-position">Environmental Committee Chair</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-            <?php elseif ($current_page === 'developers'): ?>
-    <h1 class="developer-title">Meet Our Developers</h1>
-    <div class="developers-section">
+<?php elseif ($current_page === 'developers'): ?>
+    <section class="developers-section">
+        <h1 class="developer-title">Meet Our Developers</h1>
         <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
             <?php while ($row = $dev_entries->fetch_assoc()): ?>
-                <div class="developer-card">
+                <article class="developer-card">
                     <div class="developer-name-pretext"><?= htmlspecialchars($row['title']) ?></div>
                     <?php if ($row['image']): ?>
                         <img class="developer-image-card" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['title']) ?>" loading="lazy">
@@ -641,55 +348,47 @@ switch($current_page) {
                         <?php else: ?>
                             <img class="developer-profile-image" src="../uploads/" alt="Developer Profile" />
                         <?php endif; ?>
-
                         <div class="developer-top">
                             <span><strong><?= htmlspecialchars($row['title']) ?></strong></span>
                             <span class="developer-role"><?= htmlspecialchars($row['roles']) ?></span>
-                    </div>
-                    
+                        </div>
                         <div class="developer-middle">
                             <p class="content"><?= nl2br(htmlspecialchars($row['content'])) ?></p>
-                            </div>
-
-                            <div class="developer-bottom">
-    <?php if (!empty($row['fb_links'])): ?>
-    <span class="skill">
-        <i class="bi bi-facebook"></i>
-        <a href="<?= htmlspecialchars($row['fb_links']) ?>" target="_blank" rel="noopener noreferrer">Facebook</a>
-    </span>
-    <?php endif; ?>
-
-    <?php if (!empty($row['instagram_links'])): ?>
-    <span class="skill">
-        <i class="bi bi-instagram"></i>
-        <a href="<?= htmlspecialchars($row['instagram_links']) ?>" target="_blank" rel="noopener noreferrer">Instagram</a>
-    </span>
-    <?php endif; ?>
-
-    <?php if (!empty($row['linkIn_links'])): ?>
-    <span class="skill">
-        <i class="bi bi-linkedin"></i>
-        <a href="<?= htmlspecialchars($row['linkIn_links']) ?>" target="_blank" rel="noopener noreferrer">LinkIn</a>
-    </span>
-    <?php endif; ?>
-
-    <?php if (!empty($row['github_links'])): ?>
-    <span class="skill">
-        <i class="bi bi-github"></i>
-        <a href="<?= htmlspecialchars($row['github_links']) ?>" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </span>
-    <?php endif; ?>
-
-    <?php if (!empty($row['x_links'])): ?>
-    <span class="skill">
-        <i class="bi bi-twitter-x"></i>
-        <a href="<?= htmlspecialchars($row['x_links']) ?>" target="_blank" rel="noopener noreferrer">X</a>
-    </span>
-    <?php endif; ?>
-</div>
-
+                        </div>
+                        <div class="developer-bottom">
+                            <?php if (!empty($row['fb_links'])): ?>
+                                <span class="skill">
+                                    <i class="bi bi-facebook"></i>
+                                    <a href="<?= htmlspecialchars($row['fb_links']) ?>" target="_blank" rel="noopener noreferrer">Facebook</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($row['instagram_links'])): ?>
+                                <span class="skill">
+                                    <i class="bi bi-instagram"></i>
+                                    <a href="<?= htmlspecialchars($row['instagram_links']) ?>" target="_blank" rel="noopener noreferrer">Instagram</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($row['linkIn_links'])): ?>
+                                <span class="skill">
+                                    <i class="bi bi-linkedin"></i>
+                                    <a href="<?= htmlspecialchars($row['linkIn_links']) ?>" target="_blank" rel="noopener noreferrer">LinkIn</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($row['github_links'])): ?>
+                                <span class="skill">
+                                    <i class="bi bi-github"></i>
+                                    <a href="<?= htmlspecialchars($row['github_links']) ?>" target="_blank" rel="noopener noreferrer">GitHub</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($row['x_links'])): ?>
+                                <span class="skill">
+                                    <i class="bi bi-twitter-x"></i>
+                                    <a href="<?= htmlspecialchars($row['x_links']) ?>" target="_blank" rel="noopener noreferrer">X</a>
+                                </span>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                </article>
             <?php endwhile; ?>
         <?php else: ?>
             <div class="no-content">
@@ -697,13 +396,13 @@ switch($current_page) {
                 <p>We're working on showcasing our amazing development team. Check back soon!</p>
             </div>
         <?php endif; ?>
-    </div>
+    </section>
     <?php endif; ?>
-    </div>
+    </main>
 
-     <!-- Footer -->
-        
-     <?php include 'includes/footer.php'; ?>
+    <footer>
+        <?php include 'includes/footer.php'; ?>
+    </footer>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Navigation elements
