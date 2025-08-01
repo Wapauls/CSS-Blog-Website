@@ -14,7 +14,24 @@ CREATE TABLE IF NOT EXISTS about (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image VARCHAR(255),
+    category VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS about_developers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255) NOT NULL,
+    image VARCHAR(255),
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS about_content_order (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content_type VARCHAR(50) NOT NULL,
+    content_id VARCHAR(50) NOT NULL,
+    display_order INT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS community (
