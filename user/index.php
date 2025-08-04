@@ -231,39 +231,39 @@ switch($current_page) {
                     }
                     
                     // Display content in order
+                    $entryCount = 1;
                     foreach ($ordered_content as $content) {
                         if ($content['type'] === 'post') {
                             $row = $content['data'];
                             ?>
-                            <article class="about-entry">
+                            <article class="about-entry entry<?= $entryCount ?>">
                                 <h2><?= htmlspecialchars($row['title']) ?></h2>
                                 <?php if ($row['image']): ?>
-                                    <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                                    <img class="pic<?= $entryCount ?>" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
                                 <?php endif; ?>
                                 <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
-                                <?php if (!empty($row['category'])): ?>
-                                    <div class="post-category">Category: <?= htmlspecialchars($row['category']) ?></div>
-                                <?php endif; ?>
-                                <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
                             </article>
                             <?php
+                            $entryCount++;
                         } elseif ($content['type'] === 'developers') {
+                            $devCount = 1;
                             $developers = $content['data'];
                             foreach ($developers as $dev): ?>
-                                <article class="about-entry">
-                                            <?php if ($dev['image']): ?>
-                                                <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
-                                            <?php else: ?>
-                                                <div class="about-developer-image-placeholder">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
-                                            <?php endif; ?>
-                                            <div class="about-developer-info">
-                                                <h3 class="about-developer-name"><?= htmlspecialchars($dev['name']) ?></h3>
-                                                <p class="about-developer-position"><?= htmlspecialchars($dev['position']) ?></p>
-                                            </div>
+                                <article class="entry-developer<?= $devCount ?>">
+                                    <?php if ($dev['image']): ?>
+                                        <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
+                                    <?php else: ?>
+                                        <div class="about-developer-image-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="about-developer-info<?= $entryCount ?>">
+                                        <h3 class="about-developer-name<?= $entryCount ?>"><?= htmlspecialchars($dev['name']) ?></h3>
+                                        <p class="about-developer-position<?= $entryCount ?>"><?= htmlspecialchars($dev['position']) ?></p>
+                                    </div>
                                 </article>
-                            <?php endforeach;
+                                <?php $devCount++;
+                            endforeach;
                         }
                     }
                     
@@ -279,11 +279,12 @@ switch($current_page) {
         <h2 class="section-title">Our <span>Community</span></h2>
         <div class="posts">
             <?php if ($community_entries && $community_entries->num_rows > 0): ?>
+                <?php $entryCount = 1; ?>
                 <?php while ($row = $community_entries->fetch_assoc()): ?>
-                    <article class="post">
+                    <article class="post entry<?= $entryCount ?>">
                         <h2><?= htmlspecialchars($row['title']) ?></h2>
                         <?php if ($row['image']): ?>
-                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                            <img class="pic<?= $entryCount ?>" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
                         <?php endif; ?>
                         <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                         <?php if (!empty($row['category'])): ?>
@@ -294,6 +295,7 @@ switch($current_page) {
                         <?php endif; ?>
                         <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
                     </article>
+                    <?php $entryCount++; ?>
                 <?php endwhile; ?>
             <?php else: ?>
                 <p class="no-content">Community content coming soon.</p>
@@ -306,11 +308,12 @@ switch($current_page) {
         <h2 class="section-title">News and <span>Events</span></h2>
         <div class="posts">
             <?php if ($news_entries && $news_entries->num_rows > 0): ?>
+                <?php $entryCount = 1; ?>
                 <?php while ($row = $news_entries->fetch_assoc()): ?>
-                    <article class="post">
+                    <article class="post entry<?= $entryCount ?>">
                         <h2><?= htmlspecialchars($row['title']) ?></h2>
                         <?php if ($row['image']): ?>
-                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
+                            <img class="pic<?= $entryCount ?>" src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="">
                         <?php endif; ?>
                         <p><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                         <?php if (!empty($row['category'])): ?>
@@ -321,6 +324,7 @@ switch($current_page) {
                         <?php endif; ?>
                         <div class="post-date">Posted on: <?= date('F j, Y', strtotime($row['created_at'])) ?></div>
                     </article>
+                    <?php $entryCount++; ?>
                 <?php endwhile; ?>
             <?php else: ?>
                 <p class="no-content">News and Events content coming soon.</p>

@@ -1,116 +1,89 @@
 <?php
 require_once '../config.php';
-$message = '';
-$action_type = '';
+
+// Handle flash messages
+$flash = getFlashMessage();
+$message = $flash['message'] ?? '';
+$message_type = $flash['type'] ?? '';
+$message_icon = $message_type === 'success' ? 'fa-check-circle' : ($message_type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
 
 // Handle Delete
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $stmt = $conn->prepare('DELETE FROM about WHERE id=?');
-    $stmt->bind_param('i', $id);
-    if ($stmt->execute()) {
-        // Redirect to prevent resubmission
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=deleted');
-        exit();
-    } else {
-        $message = 'Delete failed.';
+    try {
+        $stmt = $conn->prepare('SELECT image FROM about WHERE id=?');
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            if ($row['image']) safeDeleteFile('../uploads/' . $row['image']);
+        }
+        $stmt->close();
+        $stmt = $conn->prepare('DELETE FROM about WHERE id=?');
+        $stmt->bind_param('i', $id);
+        if (!$stmt->execute()) throw new Exception('Delete failed.');
+        $stmt->close();
+        redirectWithMessage($_SERVER['PHP_SELF'], 'About entry deleted successfully!', 'success');
+    } catch (Exception $e) {
+        logError('Delete error: ' . $e->getMessage());
+        redirectWithMessage($_SERVER['PHP_SELF'], 'Delete failed: ' . $e->getMessage(), 'error');
     }
-    $stmt->close();
-}
-
-// Handle Edit (fetch data)
-$edit = false;
-$edit_entry = null;
-if (isset($_GET['edit'])) {
-    $edit = true;
-    $id = intval($_GET['edit']);
-    $result = $conn->query("SELECT * FROM about WHERE id=$id");
-    $edit_entry = $result->fetch_assoc();
 }
 
 // Handle Create or Update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Only proceed if title and content are set
-    if (isset($_POST['title']) && isset($_POST['content'])) {
-        $title = trim($_POST['title']);
-        $content = trim($_POST['content']);
-        $category = trim($_POST['category'] ?? '');
-        $image = null; // Initialize as null instead of empty string
-        
-        // Handle image upload
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            $file_type = $_FILES['image']['type'];
-            
-            if (in_array($file_type, $allowed_types)) {
-                $img_name = time() . '_' . basename($_FILES['image']['name']);
-                $target = '../uploads/' . $img_name;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-                    $image = $img_name;
-                }
-            }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['about_entry_action'])) {
+    try {
+        if (!validateCSRFToken($_POST['csrf_token'] ?? '')) throw new Exception('Invalid security token.');
+        $title = sanitizeInput($_POST['title'] ?? '');
+        $content = sanitizeInput($_POST['content'] ?? '');
+        if (empty($title) || empty($content)) throw new Exception('Title and content are required.');
+        $image = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload_errors = validateImageFile($_FILES['image']);
+            if (!empty($upload_errors)) throw new Exception(implode(', ', $upload_errors));
+            ensureUploadDirectory('../uploads/');
+            $image = generateSecureFilename($_FILES['image']['name']);
+            $target = '../uploads/' . $image;
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) throw new Exception('Failed to save uploaded image.');
         }
-        
         if (isset($_POST['id']) && $_POST['id']) {
             // Update
             $id = intval($_POST['id']);
-            
-            // Check if we need to remove the existing image
             $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
-            
-            // Get the current image name before making any changes
             $stmt = $conn->prepare('SELECT image FROM about WHERE id=?');
             $stmt->bind_param('i', $id);
             $stmt->execute();
             $result = $stmt->get_result();
             $current_image = null;
-            if ($row = $result->fetch_assoc()) {
-                $current_image = $row['image'];
-            }
+            if ($row = $result->fetch_assoc()) $current_image = $row['image'];
             $stmt->close();
-            
-            // Prepare the update based on image state
+            if ($remove_image || $image) {
+                if ($current_image) safeDeleteFile('../uploads/' . $current_image);
+            }
             if ($remove_image) {
-                // Remove image case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
-                }
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=NULL, category=? WHERE id=?');
-                $stmt->bind_param('sssi', $title, $content, $category, $id);
-            } else if ($image) {
-                // New image uploaded case
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
-                }
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=?, category=? WHERE id=?');
-                $stmt->bind_param('ssssi', $title, $content, $image, $category, $id);
+                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=NULL WHERE id=?');
+                $stmt->bind_param('ssi', $title, $content, $id);
+            } elseif ($image) {
+                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=? WHERE id=?');
+                $stmt->bind_param('sssi', $title, $content, $image, $id);
             } else {
-                // No image change case
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, category=? WHERE id=?');
-                $stmt->bind_param('sssi', $title, $content, $category, $id);
+                $stmt = $conn->prepare('UPDATE about SET title=?, content=? WHERE id=?');
+                $stmt->bind_param('ssi', $title, $content, $id);
             }
-            
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
-                exit();
-            } else {
-                $message = 'Update failed: ' . $stmt->error;
-            }
+            if (!$stmt->execute()) throw new Exception('Update failed: ' . $stmt->error);
             $stmt->close();
+            redirectWithMessage($_SERVER['PHP_SELF'], 'About entry updated successfully!', 'success');
         } else {
-            // Create new entry
-            $stmt = $conn->prepare('INSERT INTO about (title, content, image, category) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssss', $title, $content, $image, $category);
-            if ($stmt->execute()) {
-                // Redirect to prevent resubmission
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
-                exit();
-            } else {
-                $message = 'Error: ' . $stmt->error;
-            }
+            // Create
+            $stmt = $conn->prepare('INSERT INTO about (title, content, image) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $title, $content, $image);
+            if (!$stmt->execute()) throw new Exception('Error: ' . $stmt->error);
             $stmt->close();
+            redirectWithMessage($_SERVER['PHP_SELF'], 'About entry added successfully!', 'success');
         }
+    } catch (Exception $e) {
+        logError('About entry form error: ' . $e->getMessage(), $_POST);
+        redirectWithMessage($_SERVER['PHP_SELF'], $e->getMessage(), 'error');
     }
 }
 
@@ -119,8 +92,8 @@ if (isset($_POST['developer_action'])) {
     $action = $_POST['developer_action'];
     
     if ($action === 'create' || $action === 'update') {
-        $name = trim($_POST['developer_name'] ?? '');
-        $position = trim($_POST['developer_position'] ?? '');
+        $name = sanitizeInput($_POST['developer_name'] ?? '');
+        $position = sanitizeInput($_POST['developer_position'] ?? '');
         $image = null;
         
         // Handle image upload
@@ -128,12 +101,16 @@ if (isset($_POST['developer_action'])) {
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             $file_type = $_FILES['developer_image']['type'];
             
-            if (in_array($file_type, $allowed_types)) {
-                $img_name = time() . '_' . basename($_FILES['developer_image']['name']);
-                $target = '../uploads/' . $img_name;
-                if (move_uploaded_file($_FILES['developer_image']['tmp_name'], $target)) {
-                    $image = $img_name;
-                }
+            if (!in_array($file_type, $allowed_types)) {
+                throw new Exception('Please select a valid image file (JPEG, PNG, GIF, WebP)');
+            }
+            
+            ensureUploadDirectory('../uploads/');
+            $image = generateSecureFilename($_FILES['developer_image']['name']);
+            $target = '../uploads/' . $image;
+            
+            if (!move_uploaded_file($_FILES['developer_image']['tmp_name'], $target)) {
+                throw new Exception('Failed to save uploaded image.');
             }
         }
         
@@ -155,13 +132,13 @@ if (isset($_POST['developer_action'])) {
             
             if ($remove_image) {
                 if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+                    safeDeleteFile('../uploads/' . $current_image);
                 }
                 $stmt = $conn->prepare('UPDATE about_developers SET name=?, position=?, image=NULL WHERE id=?');
                 $stmt->bind_param('ssi', $name, $position, $id);
             } else if ($image) {
                 if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    unlink('../uploads/' . $current_image);
+                    safeDeleteFile('../uploads/' . $current_image);
                 }
                 $stmt = $conn->prepare('UPDATE about_developers SET name=?, position=?, image=? WHERE id=?');
                 $stmt->bind_param('sssi', $name, $position, $image, $id);
@@ -170,20 +147,20 @@ if (isset($_POST['developer_action'])) {
                 $stmt->bind_param('ssi', $name, $position, $id);
             }
             
-            if ($stmt->execute()) {
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=developer_updated');
-                exit();
+            if (!$stmt->execute()) {
+                throw new Exception('Developer update failed: ' . $stmt->error);
             }
             $stmt->close();
+            redirectWithMessage($_SERVER['PHP_SELF'], 'Developer updated successfully!', 'success');
         } else {
             // Create new developer
             $stmt = $conn->prepare('INSERT INTO about_developers (name, position, image) VALUES (?, ?, ?)');
             $stmt->bind_param('sss', $name, $position, $image);
-            if ($stmt->execute()) {
-                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=developer_added');
-                exit();
+            if (!$stmt->execute()) {
+                throw new Exception('Error: ' . $stmt->error);
             }
             $stmt->close();
+            redirectWithMessage($_SERVER['PHP_SELF'], 'Developer added successfully!', 'success');
         }
     } else if ($action === 'delete' && isset($_POST['developer_id'])) {
         // Delete developer
@@ -196,18 +173,18 @@ if (isset($_POST['developer_action'])) {
         $result = $stmt->get_result();
         if ($row = $result->fetch_assoc()) {
             if ($row['image'] && file_exists('../uploads/' . $row['image'])) {
-                unlink('../uploads/' . $row['image']);
+                safeDeleteFile('../uploads/' . $row['image']);
             }
         }
         $stmt->close();
         
         $stmt = $conn->prepare('DELETE FROM about_developers WHERE id=?');
         $stmt->bind_param('i', $id);
-        if ($stmt->execute()) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=developer_deleted');
-            exit();
+        if (!$stmt->execute()) {
+            throw new Exception('Developer delete failed: ' . $stmt->error);
         }
         $stmt->close();
+        redirectWithMessage($_SERVER['PHP_SELF'], 'Developer deleted successfully!', 'success');
     } else if ($action === 'reorder') {
         // Handle drag and drop reordering
         $order_data = json_decode($_POST['order_data'], true);
@@ -215,7 +192,9 @@ if (isset($_POST['developer_action'])) {
             foreach ($order_data as $index => $id) {
                 $stmt = $conn->prepare('UPDATE about_developers SET display_order=? WHERE id=?');
                 $stmt->bind_param('ii', $index, $id);
-                $stmt->execute();
+                if (!$stmt->execute()) {
+                    throw new Exception('Developer reorder failed: ' . $stmt->error);
+                }
                 $stmt->close();
             }
             echo json_encode(['success' => true]);
@@ -229,9 +208,13 @@ if (isset($_POST['content_order_action'])) {
     $action = $_POST['content_order_action'];
     
     if ($action === 'add') {
-        $content_type = $_POST['content_type'];
-        $content_id = $_POST['content_id'];
+        $content_type = sanitizeInput($_POST['content_type'] ?? '');
+        $content_id = intval($_POST['content_id'] ?? 0);
         
+        if ($content_type === '' || $content_id === 0) {
+            throw new Exception('Invalid content type or ID.');
+        }
+
         // Get the next display order
         $max_order = $conn->query('SELECT MAX(display_order) as max_order FROM about_content_order');
         $max_order_result = $max_order->fetch_assoc();
@@ -239,29 +222,35 @@ if (isset($_POST['content_order_action'])) {
         
         $stmt = $conn->prepare('INSERT INTO about_content_order (content_type, content_id, display_order) VALUES (?, ?, ?)');
         $stmt->bind_param('ssi', $content_type, $content_id, $next_order);
-        if ($stmt->execute()) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=content_added');
-            exit();
+        if (!$stmt->execute()) {
+            throw new Exception('Content order add failed: ' . $stmt->error);
         }
         $stmt->close();
+        redirectWithMessage($_SERVER['PHP_SELF'], 'Content added to layout successfully!', 'success');
     } else if ($action === 'remove') {
-        $content_type = $_POST['content_type'];
-        $content_id = $_POST['content_id'];
+        $content_type = sanitizeInput($_POST['content_type'] ?? '');
+        $content_id = intval($_POST['content_id'] ?? 0);
         
+        if ($content_type === '' || $content_id === 0) {
+            throw new Exception('Invalid content type or ID.');
+        }
+
         $stmt = $conn->prepare('DELETE FROM about_content_order WHERE content_type = ? AND content_id = ?');
         $stmt->bind_param('ss', $content_type, $content_id);
-        if ($stmt->execute()) {
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=content_removed');
-            exit();
+        if (!$stmt->execute()) {
+            throw new Exception('Content order remove failed: ' . $stmt->error);
         }
         $stmt->close();
+        redirectWithMessage($_SERVER['PHP_SELF'], 'Content removed from layout successfully!', 'success');
     } else if ($action === 'reorder') {
         $order_data = json_decode($_POST['order_data'], true);
         if ($order_data) {
             foreach ($order_data as $index => $item) {
                 $stmt = $conn->prepare('UPDATE about_content_order SET display_order = ? WHERE content_type = ? AND content_id = ?');
                 $stmt->bind_param('iss', $index, $item['type'], $item['id']);
-                $stmt->execute();
+                if (!$stmt->execute()) {
+                    throw new Exception('Content order reorder failed: ' . $stmt->error);
+                }
                 $stmt->close();
             }
             echo json_encode(['success' => true]);
@@ -357,6 +346,9 @@ $current_page = 'about';
     <title>Admin - About</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script>
+        var csrfToken = "<?= e(generateCSRFToken()) ?>";
+    </script>
 </head>
 <body>
     <?php include 'includes/sidebar.php'; ?>
@@ -364,7 +356,7 @@ $current_page = 'about';
         <div id="popupMessage" class="popup-message<?= $message ? ' show ' . ($message_type ?? '') : '' ?>">
             <?php if ($message): ?>
                 <i class="fas <?= $message_icon ?? 'fa-info-circle' ?>"></i>
-                <?= $message ?>
+                <?= e($message) ?>
             <?php endif; ?>
         </div>
         
@@ -378,35 +370,36 @@ $current_page = 'about';
         </button>
         
         <div class="all-posts-container" id="allPostsContainer">
-            <?php if ($entries->num_rows > 0): ?>
+            <?php if ($entries && $entries->num_rows > 0): ?>
+                <?php $entryCount = 1; ?>
                 <?php while ($row = $entries->fetch_assoc()): ?>
-                    <div class="post-row" data-post-id="<?= $row['id'] ?>">
+                    <div class="post-row entry<?= $entryCount ?>" data-post-id="<?= e($row['id']) ?>">
                         <?php if ($row['image']): ?>
-                            <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['title']) ?>">
-                        <?php else: ?>
-                            <div class="no-image">
-                                <i class="fas fa-image"></i>
-                            </div>
+                            <img class="pic<?= $entryCount ?>" src="../uploads/<?= e($row['image']) ?>" alt="<?= e($row['title']) ?>">
                         <?php endif; ?>
-                        <span class="post-title"><?= htmlspecialchars($row['title']) ?></span>
-                        <span class="post-category"><?= htmlspecialchars($row['category']) ?></span>
-                        <?php
-                        $content = strip_tags($row['content']);
-                        $truncated = mb_substr($content, 0, 105);
-                        if (mb_strlen($content) > 105) {
-                            $truncated .= '...';
-                        }
-                        ?>
-                        <span class="post-content"><?= htmlspecialchars($truncated) ?></span>
+                        <div class="entry-content">
+                            <div class="entry-title"><?= e($row['title']) ?></div>
+                            <div class="entry-text">
+                                <?php
+                                $content = strip_tags($row['content']);
+                                $truncated = mb_substr($content, 0, 105);
+                                if (mb_strlen($content) > 105) {
+                                    $truncated .= '...';
+                                }
+                                echo e($truncated);
+                                ?>
+                            </div>
+                        </div>
                         <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>" data-content="<?= htmlspecialchars($row['content']) ?>" data-image="<?= htmlspecialchars($row['image']) ?>">
+                            <button class="edit-btn" data-id="<?= e($row['id']) ?>" data-title="<?= e($row['title']) ?>" data-content="<?= e($row['content']) ?>" data-image="<?= e($row['image']) ?>">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="delete-btn" data-id="<?= $row['id'] ?>" data-title="<?= htmlspecialchars($row['title']) ?>">
+                            <button class="delete-btn" data-id="<?= e($row['id']) ?>" data-title="<?= e($row['title']) ?>">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
                         </div>
                     </div>
+                    <?php $entryCount++; ?>
                 <?php endwhile; ?>
             <?php else: ?>
                 <div class="no-posts">
@@ -426,32 +419,32 @@ $current_page = 'about';
         </div>
 
         <div class="developers-container" id="developersContainer">
-            <?php if ($developer_entries->num_rows > 0): ?>
+            <?php if ($developer_entries && $developer_entries->num_rows > 0): ?>
                 <div class="developers-list" id="developersList">
                     <?php while ($row = $developer_entries->fetch_assoc()): ?>
-                        <div class="developer-item" data-id="<?= $row['id'] ?>" data-order="<?= $row['display_order'] ?>">
+                        <div class="developer-item" data-id="<?= e($row['id']) ?>" data-order="<?= e($row['display_order']) ?>">
                             <div class="drag-handle">
                                 <i class="fas fa-grip-vertical"></i>
                             </div>
                             <?php if ($row['image']): ?>
-                                <img src="../uploads/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
+                                <img src="../uploads/<?= e($row['image']) ?>" alt="<?= e($row['name']) ?>">
                             <?php else: ?>
                                 <div class="no-image">
                                     <i class="fas fa-user"></i>
                                 </div>
                             <?php endif; ?>
                             <div class="developer-info">
-                                <span class="developer-name"><?= htmlspecialchars($row['name']) ?></span>
-                                <span class="developer-position"><?= htmlspecialchars($row['position']) ?></span>
+                                <span class="developer-name"><?= e($row['name']) ?></span>
+                                <span class="developer-position"><?= e($row['position']) ?></span>
                             </div>
                             <div class="developer-actions">
-                                <button class="edit-developer-btn" data-id="<?= $row['id'] ?>" 
-                                    data-name="<?= htmlspecialchars($row['name']) ?>" 
-                                    data-position="<?= htmlspecialchars($row['position']) ?>" 
-                                    data-image="<?= htmlspecialchars($row['image'] ?? '') ?>">
+                                <button class="edit-developer-btn" data-id="<?= e($row['id']) ?>" 
+                                    data-name="<?= e($row['name']) ?>" 
+                                    data-position="<?= e($row['position']) ?>" 
+                                    data-image="<?= e($row['image'] ?? '') ?>">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="delete-developer-btn" data-id="<?= $row['id'] ?>" data-name="<?= htmlspecialchars($row['name']) ?>">
+                                <button class="delete-developer-btn" data-id="<?= e($row['id']) ?>" data-name="<?= e($row['name']) ?>">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -513,7 +506,7 @@ $current_page = 'about';
             ?>
             <div class="content-order-list" id="contentOrderList">
                 <?php foreach ($ordered_items as $item): ?>
-                    <div class="content-order-item" data-type="<?= $item['type'] ?>" data-id="<?= $item['id'] ?>" draggable="true">
+                    <div class="content-order-item" data-type="<?= e($item['type']) ?>" data-id="<?= e($item['id']) ?>" draggable="true">
                         <div class="drag-handle">
                             <i class="fas fa-grip-vertical"></i>
                         </div>
@@ -521,18 +514,18 @@ $current_page = 'about';
                             <?php if ($item['type'] === 'post'): ?>
                                 <?php $img = $item['data']['image'] ?? null; ?>
                                 <?php if ($img): ?>
-                                    <img src="../uploads/<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($item['data']['title']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
+                                    <img src="../uploads/<?= e($img) ?>" alt="<?= e($item['data']['title']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
                                 <?php endif; ?>
                                 <span class="content-type">Post</span>
-                                <span class="content-title"><?= htmlspecialchars($item['data']['title']) ?></span>
+                                <span class="content-title"><?= e($item['data']['title']) ?></span>
                             <?php else: ?>
                                 <img src="../assets/images/code.png" alt="Developers" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
                                 <span class="content-type">Developer Section</span>
-                                <span class="content-title"><?= htmlspecialchars($item['data']['title']) ?></span>
+                                <span class="content-title"><?= e($item['data']['title']) ?></span>
                             <?php endif; ?>
                         </div>
                         <div class="content-actions">
-                            <button class="remove-content-btn" data-type="<?= $item['type'] ?>" data-id="<?= $item['id'] ?>">
+                            <button class="remove-content-btn" data-type="<?= e($item['type']) ?>" data-id="<?= e($item['id']) ?>">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -571,12 +564,12 @@ $current_page = 'about';
                         
                         if (!$is_ordered):
                 ?>
-                <div class="available-item" data-type="post" data-id="<?= $post['id'] ?>">
+                <div class="available-item" data-type="post" data-id="<?= e($post['id']) ?>">
                     <div class="item-info">
-                        <span class="item-title"><?= htmlspecialchars($post['title']) ?></span>
-                        <span class="item-category"><?= htmlspecialchars($post['category']) ?></span>
+                        <span class="item-title"><?= e($post['title']) ?></span>
+
                     </div>
-                    <button class="add-content-btn" data-type="post" data-id="<?= $post['id'] ?>" data-title="<?= htmlspecialchars($post['title']) ?>">
+                    <button class="add-content-btn" data-type="post" data-id="<?= e($post['id']) ?>" data-title="<?= e($post['title']) ?>">
                         <i class="fas fa-plus"></i> Add to Layout
                     </button>
                 </div>
@@ -603,8 +596,6 @@ $current_page = 'about';
                 ?>
                 <div class="available-item" data-type="developers" data-id="developers">
                     <div class="item-info">
-                        <span class="item-title">Developer Team Section</span>
-                        <span class="item-category">Team Members</span>
                     </div>
                     <button class="add-content-btn" data-type="developers" data-id="developers" data-title="Developer Team Section">
                         <i class="fas fa-plus"></i> Add to Layout
@@ -803,6 +794,8 @@ $current_page = 'about';
                         <button type="button" class="close-modal">&times;</button>
                         <h2><i class="fas fa-plus-circle"></i> Create About Entry</h2>
                         <form id="createPostForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}">
+                            <input type="hidden" name="about_entry_action" value="create">
                             <div class="form-group">
                                 <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
                                 <input type="text" id="createTitle" name="title" placeholder="Enter entry title" required>
@@ -810,10 +803,6 @@ $current_page = 'about';
                             <div class="form-group">
                                 <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="createContent" name="content" placeholder="Write your entry content here..." required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="createCategory"><i class="fas fa-tags"></i> Category</label>
-                                <input type="text" id="createCategory" name="category" placeholder="Enter category (e.g., News, Events, Announcements)" required>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Featured Image</label>
@@ -837,6 +826,8 @@ $current_page = 'about';
                         <button type="button" class="close-modal">&times;</button>
                         <h2><i class="fas fa-edit"></i> Edit About Entry</h2>
                         <form id="editPostForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}">
+                            <input type="hidden" name="about_entry_action" value="update">
                             <input type="hidden" name="id" value="${data.id}">
                             <input type="hidden" name="remove_image" value="false" id="removeImageFlag">
                             <div class="form-group">
@@ -846,10 +837,6 @@ $current_page = 'about';
                             <div class="form-group">
                                 <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
                                 <textarea id="editContent" name="content" required>${data.content}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="editCategory"><i class="fas fa-tags"></i> Category</label>
-                                <input type="text" id="editCategory" name="category" value="${data.category}" required>
                             </div>
                             <div class="custom-file">
                                 <label><i class="fas fa-image"></i> Featured Image</label>
@@ -966,6 +953,7 @@ $current_page = 'about';
                         <button type="button" class="close-modal">&times;</button>
                         <h2><i class="fas fa-user-plus"></i> Add New Developer</h2>
                         <form id="createDeveloperForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}">
                             <input type="hidden" name="developer_action" value="create">
                             <div class="form-group">
                                 <label for="createDeveloperName"><i class="fas fa-user"></i> Name</label>
@@ -997,6 +985,7 @@ $current_page = 'about';
                         <button type="button" class="close-modal">&times;</button>
                         <h2><i class="fas fa-edit"></i> Edit Developer</h2>
                         <form id="editDeveloperForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="${csrfToken}">
                             <input type="hidden" name="developer_action" value="update">
                             <input type="hidden" name="developer_id" value="${data.id}">
                             <input type="hidden" name="remove_developer_image" value="false" id="removeDeveloperImageFlag">
@@ -1254,6 +1243,7 @@ $current_page = 'about';
             const form = document.createElement('form');
             form.method = 'POST';
             form.innerHTML = `
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
                 <input type="hidden" name="content_order_action" value="add">
                 <input type="hidden" name="content_type" value="${contentData.type}">
                 <input type="hidden" name="content_id" value="${contentData.id}">
@@ -1267,6 +1257,7 @@ $current_page = 'about';
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.innerHTML = `
+                    <input type="hidden" name="csrf_token" value="${csrfToken}">
                     <input type="hidden" name="content_order_action" value="remove">
                     <input type="hidden" name="content_type" value="${contentData.type}">
                     <input type="hidden" name="content_id" value="${contentData.id}">
@@ -1302,6 +1293,7 @@ $current_page = 'about';
             const form = document.createElement('form');
             form.method = 'POST';
             form.innerHTML = `
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
                 <input type="hidden" name="developer_action" value="delete">
                 <input type="hidden" name="developer_id" value="${id}">
             `;
