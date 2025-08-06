@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS about (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image VARCHAR(255),
-    category VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -40,6 +39,7 @@ CREATE TABLE IF NOT EXISTS community (
     content TEXT NOT NULL,
     image VARCHAR(255),
     section VARCHAR(10) NOT NULL,
+    category VARCHAR(255) NOT NULL,
     year INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

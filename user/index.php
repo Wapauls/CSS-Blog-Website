@@ -249,11 +249,11 @@ switch($current_page) {
                             $devCount = 1;
                             $developers = $content['data'];
                             foreach ($developers as $dev): ?>
-                                <article class="entry-developer<?= $devCount ?>">
+                                <article class="entry-developer<?= $entryCount ?>">
                                     <?php if ($dev['image']): ?>
-                                        <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image">
+                                        <img src="../uploads/<?= htmlspecialchars($dev['image']) ?>" alt="<?= htmlspecialchars($dev['name']) ?>" class="about-developer-image<?= $entryCount ?>">
                                     <?php else: ?>
-                                        <div class="about-developer-image-placeholder">
+                                        <div class="about-developer-image-placeholder<?= $entryCount ?>">
                                             <i class="fas fa-user"></i>
                                         </div>
                                     <?php endif; ?>
