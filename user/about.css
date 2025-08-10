@@ -1,0 +1,702 @@
+/* About Hero Section - Enhanced Typography */
+.about-page-hero {
+    background-color: #000000;
+    padding: 4rem 2rem;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    margin-top: 80px;
+}
+
+.about-page-container {
+    transform: translateY(2rem);
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-page-text-content {
+    color: white;
+}
+
+.about-page-text-content h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+    color: white;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.about-page-text-content p {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    line-height: 1.7;
+    color: #e0e0e0;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+}
+
+.about-know-more-btn {
+    background-color: #40E0D0;
+    color: #000000;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.about-know-more-btn:hover {
+    background-color: #36C9D9;
+    transform: translateY(-2px);
+}
+
+.about-page-hero-image {
+    position: relative;
+    display: flex;
+}
+
+.about-page-hero-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 3px solid #40E0D0;
+}
+
+/* About Main Text Section - Enhanced Typography */
+.about-main-text {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: white;
+}
+
+.about-main-text h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: white;
+    margin-bottom: 2rem;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* About Card Layouts */
+.about-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    max-width: 1400px;
+    margin: auto;
+    justify-content: center;
+}
+
+.about-row-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.about-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 3rem auto;
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+.about-card {
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.8) 100%);
+    color: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(64, 224, 208, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(64, 224, 208, 0.1);
+    transition: all 0.4s ease;
+    min-width: 300px;
+    flex: 1;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.about-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #40E0D0, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.about-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(64, 224, 208, 0.2);
+    border-color: rgba(64, 224, 208, 0.4);
+}
+
+.about-card:hover::before {
+    opacity: 1;
+}
+
+.about-card h4 {
+    background-color: #40E0D0;
+    color: #000;
+    text-align: center;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 100%;
+}
+
+.about-card ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.about-card li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+/* About Section Divider */
+.about-section-divider {
+    height: 2px;
+    background-color: #ffffff;
+    margin: 50px auto;
+    max-width: 1200px;
+}
+
+/* About Why BSCS Section */
+.about-main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 80px 60px;
+    min-height: 70vh;
+}
+
+.about-content-left {
+    flex: 1;
+    max-width: 600px;
+}
+
+.about-main-title {
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-bottom: 40px;
+}
+
+.about-why-text {
+    color: #00ffff;
+}
+
+.about-bachelor-text {
+    color: #fff;
+}
+
+.about-description,
+.about-impact-text {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #ccc;
+    margin-bottom: 30px;
+}
+
+.about-impact-text:last-child {
+    margin-bottom: 0;
+}
+
+.about-content-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 40px;
+}
+
+.about-poster-container {
+    max-width: 500px;
+    width: 100%;
+}
+
+.about-poster-image {
+    width: 100%;
+    border-radius: 15px;
+    border: 3px solid turquoise;
+    box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+}
+
+/* What is BSCS Section Styles */
+.about-what-is-bscs-section {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    padding: 80px 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.about-what-is-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.about-bscs-content {
+    padding: 32px;
+    border-radius: 10px;
+    font-size: 10px;
+    color: #222;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 32px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 550px;
+}
+
+.about-bscs-main-title {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 10px 0;
+}
+
+.about-what-highlight {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 30px 0;
+    background: linear-gradient(135deg, #00ffff, #00ffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.about-is-text {
+    color: #fff;
+    vertical-align: top;
+    transform: rotate(180deg);
+    writing-mode: vertical-lr;
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 25px;
+    font-family: Arial;
+}
+
+.about-degree-title {
+    color: white;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.about-bscs-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.about-bscs-description p {
+    margin: 0 0 20px 0;
+    text-align: justify;
+}
+
+.about-bscs-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* Enrollment Section */
+.about-enrollment-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 48px 0;
+    background: #000000; 
+}
+
+.about-enrollment-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0 30px;
+    gap: 12rem;
+    background-color: #000000;
+}
+
+.about-enrollment-image {
+    width: 120%;
+    border-radius: 50px;
+    border: 3px solid turquoise;
+    box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+}
+
+.about-content-section {
+    flex: 1;
+    max-width: 600px;
+}
+
+.about-content-section h1 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 20px;
+    color: #ccc;
+    width: 500px;
+}
+
+.about-content-section h2 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #00ffff 0%, #00ffff 0%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-content-section p {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    color: #ddd;
+}
+
+.about-tour-info h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.about-tour-info p {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+/* Partner Spotlight Section */
+.about-css-highlight {
+    color: #00ffff;
+}
+
+.about-features-list {
+    margin: 2rem 0;
+}
+
+.about-features-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.about-features-list li {
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.about-page-hero-images {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.about-school-logo {
+    margin-top: 3rem;
+    margin-left: 5rem;
+    width: 350px;
+    height: 568px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 3px solid #40E0D0;
+}
+
+/* Edusuite Payment Instructions Section */
+.about-edusuite-payment-section {
+    padding: 50px 0;
+    background: #000;
+}
+
+.about-edusuite-card {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 30px;
+    padding: 40px;
+    overflow: hidden;
+    max-width: 500px;
+    height: auto;
+}
+
+.about-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.about-card-footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.about-payment-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.about-payment-step {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.about-payment-step h4 {
+    color: #40E0D0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .about-main-content {
+        padding: 60px 40px;
+    }
+
+    .about-main-title,
+    .about-page-text-content h1 {
+        font-size: 56px;
+    }
+
+    .about-page-container {
+        gap: 40px;
+    }
+
+    .about-what-is-container {
+        gap: 60px;
+        padding: 0 30px;
+    }
+    
+    .about-bscs-main-title {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 968px) {
+    .about-main-content,
+    .about-page-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-content-right,
+    .about-page-hero-image {
+        padding-left: 0;
+        margin-top: 40px;
+    }
+
+    .about-main-title,
+    .about-page-text-content h1 {
+        font-size: 42px;
+    }
+
+    .about-page-hero {
+        padding: 60px 30px;
+    }
+
+    .about-what-is-container {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        text-align: center;
+    }
+    
+    .about-bscs-main-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-page-hero {
+        padding: 2rem 1rem;
+        min-height: 70vh;
+        margin-top: 70px;
+    }
+    
+    .about-page-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+        transform: translateY(1rem);
+    }
+    
+    .about-page-hero-image img {
+        height: 280px;
+    }
+
+    .about-main-text {
+        padding: 2rem 1rem;
+    }
+
+    .about-grid-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1.5rem;
+        margin: 2rem auto;
+    }
+
+    .about-row-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .about-card {
+        min-width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    
+    .about-card h4 {
+        font-size: 1rem;
+        padding: 10px;
+    }
+    
+    .about-card li {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+
+    .about-what-is-bscs-section {
+        padding: 3rem 0;
+    }
+    
+    .about-what-is-container {
+        padding: 0 1rem;
+        gap: 2rem;
+    }
+    
+    .about-bscs-content {
+        width: 100%;
+        max-width: 100%;
+        padding: 1.5rem;
+        margin: 0;
+    }
+    
+    .about-bscs-description {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .about-bscs-description p {
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+}
+
+@media (max-width: 640px) {
+    .about-main-title,
+    .about-page-text-content h1 {
+        font-size: 32px;
+    }
+
+    .about-description,
+    .about-impact-text,
+    .about-page-text-content p {
+        font-size: 16px;
+    }
+
+    .about-know-more-btn {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+
+    .about-page-hero {
+        padding: 40px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-page-text-content h1 {
+        font-size: 2rem;
+    }
+
+    .about-main-text h1 {
+        font-size: 1.5rem;
+    }
+
+    .about-card {
+        min-width: 250px;
+        padding: 15px;
+    }
+
+    .about-bscs-main-title {
+        font-size: 2rem;
+    }
+    
+    .about-edusuite-card {
+        padding: 20px;
+        margin: 0 10px;
+    }
+    
+    .about-card-header {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .about-main-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-edusuite-card {
+        width: 100%;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-content-section h2 {
+        font-size: 36px;
+    }
+
+    .about-edusuite-card {
+        height: auto;
+        padding: 30px;
+    }
+}

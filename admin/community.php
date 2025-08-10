@@ -30,15 +30,203 @@ if (isset($_GET['edit'])) {
 
 // Handle Create or Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Only proceed if title and content are set
-    if (isset($_POST['title']) && isset($_POST['content'])) {
-        $title = trim($_POST['title']);
-        $content = trim($_POST['content']);
-        $section = trim($_POST['section'] ?? '');
-        $year = intval($_POST['year'] ?? 0);
-        $image = null; // Initialize as null instead of empty string
+    // Check if this is a member form or content form
+    $is_member = isset($_POST['type']) && $_POST['type'] === 'member';
+    
+    if ($is_member) {
+        // Handle member form
+        if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category'])) {
+            $title = trim($_POST['title']);
+            $content = trim($_POST['content']); // This will be the position
+            $category = trim($_POST['category']);
+            $image = null;
+            
+            // Handle image upload
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                $file_type = $_FILES['image']['type'];
+                
+                if (in_array($file_type, $allowed_types)) {
+                    $img_name = time() . '_' . basename($_FILES['image']['name']);
+                    $target = '../uploads/' . $img_name;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                        $image = $img_name;
+                    }
+                }
+            }
+            
+            if (isset($_POST['id']) && $_POST['id']) {
+                // Update member
+                $id = intval($_POST['id']);
+                
+                // Check if we need to remove the existing image
+                $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
+                
+                // Get the current image name before making any changes
+                $stmt = $conn->prepare('SELECT image FROM community WHERE id = ?');
+                if ($stmt) {
+                    $stmt->bind_param('i', $id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $current_image = null;
+                    if ($row = $result->fetch_assoc()) {
+                        $current_image = $row['image'];
+                    }
+                    $stmt->close();
+                    
+                    // Prepare the update based on image state
+                    if ($remove_image) {
+                        // Remove image case
+                        if ($current_image && file_exists('../uploads/' . $current_image)) {
+                            unlink('../uploads/' . $current_image);
+                        }
+                        $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, category = ?, image = NULL WHERE id = ?');
+                        if ($stmt) {
+                            $stmt->bind_param('sssi', $title, $content, $category, $id);
+                            if ($stmt->execute()) {
+                                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                                exit();
+                            } else {
+                                $message = 'Update failed: ' . $stmt->error;
+                            }
+                            $stmt->close();
+                        }
+                    } else if ($image) {
+                        // New image uploaded case
+                        if ($current_image && file_exists('../uploads/' . $current_image)) {
+                            unlink('../uploads/' . $current_image);
+                        }
+                        $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, category = ?, image = ? WHERE id = ?');
+                        if ($stmt) {
+                            $stmt->bind_param('ssssi', $title, $content, $category, $image, $id);
+                            if ($stmt->execute()) {
+                                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                                exit();
+                            } else {
+                                $message = 'Update failed: ' . $stmt->error;
+                            }
+                            $stmt->close();
+                        }
+                    } else {
+                        // No image change case
+                        $stmt = $conn->prepare('UPDATE community SET title = ?, content = ?, category = ? WHERE id = ?');
+                        if ($stmt) {
+                            $stmt->bind_param('sssi', $title, $content, $category, $id);
+                            if ($stmt->execute()) {
+                                header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                                exit();
+                            } else {
+                                $message = 'Update failed: ' . $stmt->error;
+                            }
+                            $stmt->close();
+                        }
+                    }
+                }
+            } else {
+                // Create new member
+                $stmt = $conn->prepare('INSERT INTO community (title, content, category, image) VALUES (?, ?, ?, ?)');
+                if ($stmt) {
+                    $stmt->bind_param('ssss', $title, $content, $category, $image);
+                    if ($stmt->execute()) {
+                        header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
+                        exit();
+                    } else {
+                        $message = 'Error: ' . $stmt->error;
+                    }
+                    $stmt->close();
+                } else {
+                    $message = 'Error preparing statement: ' . $conn->error;
+                }
+            }
+        }
+    } else if (isset($_POST['type']) && $_POST['type'] === 'embedded') {
+        // Handle embedded image form
+        $image_type = trim($_POST['image_type']);
+        $image = null;
         
         // Handle image upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $file_type = $_FILES['image']['type'];
+            
+            if (in_array($file_type, $allowed_types)) {
+                $img_name = time() . '_' . basename($_FILES['image']['name']);
+                $target = '../uploads/' . $img_name;
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                    $image = $img_name;
+                }
+            }
+        }
+        
+        if ($image) {
+            if (isset($_POST['id']) && $_POST['id']) {
+                // Update existing embedded image
+                $id = intval($_POST['id']);
+                
+                // Get the current image name before making any changes
+                $stmt = $conn->prepare('SELECT image FROM community WHERE id = ?');
+                if ($stmt) {
+                    $stmt->bind_param('i', $id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $current_image = null;
+                    if ($row = $result->fetch_assoc()) {
+                        $current_image = $row['image'];
+                    }
+                    $stmt->close();
+                    
+                    // Remove old image if it exists
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    
+                    // Update the image
+                    $stmt = $conn->prepare('UPDATE community SET image = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('si', $image, $id);
+                        if ($stmt->execute()) {
+                            header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=updated');
+                            exit();
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
+                }
+            } else {
+                // Create new embedded image entry
+                $title = ucfirst(str_replace('_', ' ', $image_type)) . ' Image';
+                $content = 'Embedded image for ' . $image_type;
+                $category = 'embedded';
+                $section = $image_type;
+                
+                $stmt = $conn->prepare('INSERT INTO community (title, content, category, section, image) VALUES (?, ?, ?, ?, ?)');
+                if ($stmt) {
+                    $stmt->bind_param('sssss', $title, $content, $category, $section, $image);
+                    if ($stmt->execute()) {
+                        header('Location: ' . $_SERVER['PHP_SELF'] . '?msg=added');
+                        exit();
+                    } else {
+                        $message = 'Error: ' . $stmt->error;
+                    }
+                    $stmt->close();
+                } else {
+                    $message = 'Error preparing statement: ' . $conn->error;
+                }
+            }
+        } else {
+            $message = 'Please select a valid image file.';
+        }
+    } else {
+        // Handle content form (existing logic)
+        if (isset($_POST['title']) && isset($_POST['content'])) {
+            $title = trim($_POST['title']);
+            $content = trim($_POST['content']);
+            $section = trim($_POST['section'] ?? '');
+            $year = intval($_POST['year'] ?? 0);
+            $image = null; // Initialize as null instead of empty string
+            
+            // Handle image upload
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             $file_type = $_FILES['image']['type'];
@@ -137,6 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+}
 
 // Show message from redirect
 if (isset($_GET['msg'])) {
@@ -204,9 +393,22 @@ $current_page = 'community';
         </div>
         
         <h1>Community Management</h1>
-        <button class="stat-link" id="openCreateModal">
-            <i class="fas fa-plus"></i> Create New Community Entry
-        </button>
+        <div class="management-tabs">
+            <button class="tab-btn active" data-tab="content">
+                <i class="fas fa-file-alt"></i> Content
+            </button>
+            <button class="tab-btn" data-tab="embedded">
+                <i class="fas fa-image"></i> Embedded Images
+            </button>
+            <button class="tab-btn" data-tab="members">
+                <i class="fas fa-users"></i> Members
+            </button>
+        </div>
+        
+        <div class="tab-content active" id="content-tab">
+            <button class="stat-link" id="openCreateModal">
+                <i class="fas fa-plus"></i> Create New Community Content
+            </button>
         
         <div class="all-posts-container" id="allPostsContainer">
             <?php if ($entries->num_rows > 0): ?>
@@ -249,12 +451,151 @@ $current_page = 'community';
             <?php else: ?>
                 <div class="no-posts">
                     <i class="fas fa-users"></i>
-                    <p>No community entries found. Start by creating your first entry!</p>
+                    <p>No community content found. Start by creating your first entry!</p>
                     <button class="stat-link" id="openCreateModalEmpty">
                         <i class="fas fa-plus"></i> Create Your First Entry
                     </button>
                 </div>
             <?php endif; ?>
+        </div>
+        </div>
+        
+        <!-- Embedded Images Tab -->
+        <div class="tab-content" id="embedded-tab">
+            <div class="embedded-images-section">
+                <h3>Manage Embedded Images</h3>
+                <p>Upload or replace images that appear in the community section content.</p>
+                
+                <div class="embedded-images-grid">
+                    <div class="embedded-image-card">
+                        <h4>Campaign Image</h4>
+                        <div class="image-upload-area" data-image-type="campaign">
+                            <?php 
+                            $campaign_image = $conn->query('SELECT * FROM community WHERE category = "embedded" AND section = "campaign" LIMIT 1');
+                            if ($campaign_image && $campaign_image->num_rows > 0) {
+                                $campaign = $campaign_image->fetch_assoc();
+                            ?>
+                                <div class="current-image">
+                                    <img src="../uploads/<?= htmlspecialchars($campaign['image']) ?>" alt="Campaign Image">
+                                    <button class="replace-image-btn" data-image-type="campaign" data-image-id="<?= $campaign['id'] ?>">
+                                        <i class="fas fa-sync-alt"></i> Replace
+                                    </button>
+                                </div>
+                            <?php } else { ?>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>No image uploaded</p>
+                                    <button class="upload-image-btn" data-image-type="campaign">
+                                        <i class="fas fa-plus"></i> Upload Image
+                                    </button>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <div class="embedded-image-card">
+                        <h4>CS Society Image</h4>
+                        <div class="image-upload-area" data-image-type="cs_society">
+                            <?php 
+                            $cs_image = $conn->query('SELECT * FROM community WHERE category = "embedded" AND section = "cs_society" LIMIT 1');
+                            if ($cs_image && $cs_image->num_rows > 0) {
+                                $cs = $cs_image->fetch_assoc();
+                            ?>
+                                <div class="current-image">
+                                    <img src="../uploads/<?= htmlspecialchars($cs['image']) ?>" alt="CS Society Image">
+                                    <button class="replace-image-btn" data-image-type="cs_society" data-image-id="<?= $cs['id'] ?>">
+                                        <i class="fas fa-sync-alt"></i> Replace
+                                    </button>
+                                </div>
+                            <?php } else { ?>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>No image uploaded</p>
+                                    <button class="upload-image-btn" data-image-type="cs_society">
+                                        <i class="fas fa-plus"></i> Upload Image
+                                    </button>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <div class="embedded-image-card">
+                        <h4>Adviser Image</h4>
+                        <div class="image-upload-area" data-image-type="adviser">
+                            <?php 
+                            $adviser_image = $conn->query('SELECT * FROM community WHERE category = "embedded" AND section = "adviser" LIMIT 1');
+                            if ($adviser_image && $adviser_image->num_rows > 0) {
+                                $adviser = $adviser_image->fetch_assoc();
+                            ?>
+                                <div class="current-image">
+                                    <img src="../uploads/<?= htmlspecialchars($adviser['image']) ?>" alt="Adviser Image">
+                                    <button class="replace-image-btn" data-image-type="adviser" data-image-id="<?= $adviser['id'] ?>">
+                                        <i class="fas fa-sync-alt"></i> Replace
+                                    </button>
+                                </div>
+                            <?php } else { ?>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>No image uploaded</p>
+                                    <button class="upload-image-btn" data-image-type="adviser">
+                                        <i class="fas fa-plus"></i> Upload Image
+                                    </button>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Members Tab -->
+        <div class="tab-content" id="members-tab">
+            <button class="stat-link" id="openCreateMemberModal">
+                <i class="fas fa-plus"></i> Add New Member
+            </button>
+            
+            <div class="members-container">
+                <?php 
+                // Fetch members from community table where category is member-related
+                $members = $conn->query('SELECT * FROM community WHERE category IN ("faculty", "executive", "core", "year_representative", "committee") ORDER BY category, display_order ASC');
+                if ($members && $members->num_rows > 0): 
+                ?>
+                    <div class="members-grid">
+                        <?php while ($member = $members->fetch_assoc()): ?>
+                            <div class="member-card" data-member-id="<?= $member['id'] ?>">
+                                <?php if ($member['image']): ?>
+                                    <img src="../uploads/<?= htmlspecialchars($member['image']) ?>" alt="<?= htmlspecialchars($member['title']) ?>" class="member-image">
+                                <?php else: ?>
+                                    <div class="member-image-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="member-info">
+                                    <h3 class="member-name"><?= htmlspecialchars($member['title']) ?></h3>
+                                    <p class="member-position"><?= htmlspecialchars($member['content']) ?></p>
+                                    <span class="member-category"><?= htmlspecialchars($member['category']) ?></span>
+                                </div>
+                                <div class="member-actions">
+                                    <button class="edit-member-btn" data-id="<?= $member['id'] ?>" data-title="<?= htmlspecialchars($member['title']) ?>" data-content="<?= htmlspecialchars($member['content']) ?>" data-category="<?= htmlspecialchars($member['category']) ?>" data-image="<?= htmlspecialchars($member['image']) ?>">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="delete-member-btn" data-id="<?= $member['id'] ?>" data-title="<?= htmlspecialchars($member['title']) ?>">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="no-members">
+                        <i class="fas fa-user-friends"></i>
+                        <p>No members found. Start by adding your first member!</p>
+                        <button class="stat-link" id="openCreateMemberModalEmpty">
+                            <i class="fas fa-plus"></i> Add Your First Member
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
         
         <!-- Modal Container -->
@@ -315,6 +656,42 @@ $current_page = 'community';
             });
         }
 
+        // Tab functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(targetTab + '-tab').classList.add('active');
+            });
+        });
+
+        // Open Create Member Modal
+        const openCreateMemberModalBtn = document.getElementById('openCreateMemberModal');
+        if (openCreateMemberModalBtn) {
+            openCreateMemberModalBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                openModal('create_member');
+            });
+        }
+
+        // Add click handler for empty state create member button
+        const openCreateMemberModalEmptyBtn = document.getElementById('openCreateMemberModalEmpty');
+        if (openCreateMemberModalEmptyBtn) {
+            openCreateMemberModalEmptyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                openModal('create_member');
+            });
+        }
+
         // Event delegation for edit and delete buttons
         document.addEventListener('click', function(e) {
             // Edit button handler
@@ -345,6 +722,33 @@ $current_page = 'community';
                 return;
             }
             
+            // Edit member button handler
+            if (e.target.closest('.edit-member-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.edit-member-btn');
+                const memberData = {
+                    id: btn.getAttribute('data-id'),
+                    title: btn.getAttribute('data-title'),
+                    content: btn.getAttribute('data-content'),
+                    category: btn.getAttribute('data-category'),
+                    image: btn.getAttribute('data-image')
+                };
+                openModal('edit_member', memberData);
+                return;
+            }
+            
+            // Delete member button handler
+            if (e.target.closest('.delete-member-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.delete-member-btn');
+                const memberData = {
+                    id: btn.getAttribute('data-id'),
+                    title: btn.getAttribute('data-title')
+                };
+                openModal('delete_member', memberData);
+                return;
+            }
+            
             // Close modal handler
             if (e.target.classList.contains('close-modal')) {
                 e.preventDefault();
@@ -355,6 +759,25 @@ $current_page = 'community';
             // Close modal on outside click
             if (e.target.classList.contains('modal') && isModalOpen) {
                 closeModal();
+                return;
+            }
+            
+            // Embedded image upload button handler
+            if (e.target.closest('.upload-image-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.upload-image-btn');
+                const imageType = btn.getAttribute('data-image-type');
+                openModal('upload_embedded', { imageType: imageType });
+                return;
+            }
+            
+            // Embedded image replace button handler
+            if (e.target.closest('.replace-image-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.replace-image-btn');
+                const imageType = btn.getAttribute('data-image-type');
+                const imageId = btn.getAttribute('data-image-id');
+                openModal('replace_embedded', { imageType: imageType, imageId: imageId });
                 return;
             }
         });
@@ -490,6 +913,176 @@ $current_page = 'community';
                     </div>
                 </div>`;
             }
+            else if (type === 'create_member') {
+                modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <button type="button" class="close-modal">&times;</button>
+                        <h2><i class="fas fa-plus-circle"></i> Add New Member</h2>
+                        <form id="createMemberForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="type" value="member">
+                            <div class="form-group">
+                                <label for="createMemberName"><i class="fas fa-user"></i> Name</label>
+                                <input type="text" id="createMemberName" name="title" placeholder="Enter member name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="createMemberPosition"><i class="fas fa-briefcase"></i> Position</label>
+                                <input type="text" id="createMemberPosition" name="content" placeholder="Enter member position" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="createMemberCategory"><i class="fas fa-tag"></i> Category</label>
+                                <select id="createMemberCategory" name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="faculty">Faculty</option>
+                                    <option value="executive">Executive</option>
+                                    <option value="core">Core</option>
+                                    <option value="year_representative">Year Representative</option>
+                                    <option value="committee">Committee</option>
+                                </select>
+                            </div>
+                            <div class="custom-file">
+                                <label><i class="fas fa-image"></i> Member Photo</label>
+                                <label class="file-input-label" for="createMemberImage">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Click to upload image</span>
+                                </label>
+                                <input type="file" name="image" id="createMemberImage" accept="image/*">
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-plus"></i> Add Member
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+            }
+            else if (type === 'edit_member') {
+                modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <button type="button" class="close-modal">&times;</button>
+                        <h2><i class="fas fa-edit"></i> Edit Member</h2>
+                        <form id="editMemberForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id" value="${data.id}">
+                            <input type="hidden" name="type" value="member">
+                            <input type="hidden" name="remove_image" value="false" id="removeMemberImageFlag">
+                            <div class="form-group">
+                                <label for="editMemberName"><i class="fas fa-user"></i> Name</label>
+                                <input type="text" id="editMemberName" name="title" value="${data.title}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMemberPosition"><i class="fas fa-briefcase"></i> Position</label>
+                                <input type="text" id="editMemberPosition" name="content" value="${data.content}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMemberCategory"><i class="fas fa-tag"></i> Category</label>
+                                <select id="editMemberCategory" name="category" required>
+                                    <option value="faculty" ${data.category === 'faculty' ? 'selected' : ''}>Faculty</option>
+                                    <option value="executive" ${data.category === 'executive' ? 'selected' : ''}>Executive</option>
+                                    <option value="core" ${data.category === 'core' ? 'selected' : ''}>Core</option>
+                                    <option value="year_representative" ${data.category === 'year_representative' ? 'selected' : ''}>Year Representative</option>
+                                    <option value="committee" ${data.category === 'committee' ? 'selected' : ''}>Committee</option>
+                                </select>
+                            </div>
+                            <div class="custom-file">
+                                <label><i class="fas fa-image"></i> Member Photo</label>
+                                <div id="existingMemberImageContainer">
+                                    ${data.image ? `
+                                        <div class="img-preview-container show existing-image" data-image="${data.image}">
+                                            <div class="previewImageBlur">
+                                                <i class="fas fa-eye"></i>
+                                                <span>Preview image</span>
+                                            </div>
+                                            <img src="../uploads/${data.image}" alt="Current image">
+                                            <button type="button" class="remove-preview" title="Remove image">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <label class="file-input-label" for="editMemberImage">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>${data.image ? 'Change image' : 'Click to upload image'}</span>
+                                </label>
+                                <input type="file" name="image" id="editMemberImage" accept="image/*">
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+            }
+            else if (type === 'delete_member') {
+                modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <button type="button" class="close-modal">&times;</button>
+                        <h2><i class="fas fa-trash-alt"></i> Delete Member</h2>
+                        <div class="delete-confirmation">
+                            <i class="fas fa-exclamation-triangle headTrash"></i>
+                            <p>Are you sure you want to delete "<strong>${data.title}</strong>"?</p>
+                            <p>This action cannot be undone.</p>
+                            <div class="delete-actions">
+                                <button type="button" class="deleting-btn" onclick="confirmDeleteMember(${data.id})">
+                                    <i class="fas fa-trash btnTrash"></i> Delete Member
+                                </button>
+                                <button type="button" class="cancel-btn" onclick="closeModal()">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            else if (type === 'upload_embedded') {
+                modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <button type="button" class="close-modal">&times;</button>
+                        <h2><i class="fas fa-cloud-upload-alt"></i> Upload ${data.imageType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Image</h2>
+                        <form id="uploadEmbeddedForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="type" value="embedded">
+                            <input type="hidden" name="image_type" value="${data.imageType}">
+                            <div class="custom-file">
+                                <label><i class="fas fa-image"></i> Select Image</label>
+                                <label class="file-input-label" for="uploadEmbeddedImage">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Click to upload image</span>
+                                </label>
+                                <input type="file" name="image" id="uploadEmbeddedImage" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-upload"></i> Upload Image
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+            }
+            else if (type === 'replace_embedded') {
+                modalHTML = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <button type="button" class="close-modal">&times;</button>
+                        <h2><i class="fas fa-sync-alt"></i> Replace ${data.imageType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Image</h2>
+                        <form id="replaceEmbeddedForm" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id" value="${data.imageId}">
+                            <input type="hidden" name="type" value="embedded">
+                            <input type="hidden" name="image_type" value="${data.imageType}">
+                            <div class="custom-file">
+                                <label><i class="fas fa-image"></i> Select New Image</label>
+                                <label class="file-input-label" for="replaceEmbeddedImage">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Click to upload new image</span>
+                                </label>
+                                <input type="file" name="image" id="replaceEmbeddedImage" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-sync-alt"></i> Replace Image
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+            }
             
             showModal(modalHTML);
             
@@ -506,6 +1099,21 @@ $current_page = 'community';
                     
                     // Setup new image preview
                     setupImagePreview('editImage');
+                } else if (type === 'create_member') {
+                    setupImagePreview('createMemberImage');
+                } else if (type === 'edit_member') {
+                    // Handle existing image removal
+                    const existingContainer = document.querySelector('#existingMemberImageContainer .img-preview-container.existing-image');
+                    if (existingContainer) {
+                        handleExistingImageRemove(existingContainer);
+                    }
+                    
+                    // Setup new image preview
+                    setupImagePreview('editMemberImage');
+                } else if (type === 'upload_embedded') {
+                    setupImagePreview('uploadEmbeddedImage');
+                } else if (type === 'replace_embedded') {
+                    setupImagePreview('replaceEmbeddedImage');
                 }
             }, 100);
         }
@@ -552,6 +1160,17 @@ $current_page = 'community';
             }
             
             // Redirect to delete
+            window.location.href = `?delete=${id}`;
+        };
+
+        window.confirmDeleteMember = function(id) {
+            const deleteBtn = document.querySelector('.delete-actions .deleting-btn');
+            if (deleteBtn) {
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                deleteBtn.disabled = true;
+            }
+            
+            // Redirect to delete member
             window.location.href = `?delete=${id}`;
         };
 

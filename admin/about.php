@@ -7,255 +7,87 @@ $message = $flash['message'] ?? '';
 $message_type = $flash['type'] ?? '';
 $message_icon = $message_type === 'success' ? 'fa-check-circle' : ($message_type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
 
-// Handle Delete
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-    try {
-        $stmt = $conn->prepare('SELECT image FROM about WHERE id=?');
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($row['image']) safeDeleteFile('../uploads/' . $row['image']);
-        }
-        $stmt->close();
-        $stmt = $conn->prepare('DELETE FROM about WHERE id=?');
-        $stmt->bind_param('i', $id);
-        if (!$stmt->execute()) throw new Exception('Delete failed.');
-        $stmt->close();
-        redirectWithMessage($_SERVER['PHP_SELF'], 'About entry deleted successfully!', 'success');
-    } catch (Exception $e) {
-        logError('Delete error: ' . $e->getMessage());
-        redirectWithMessage($_SERVER['PHP_SELF'], 'Delete failed: ' . $e->getMessage(), 'error');
-    }
-}
-
-// Handle Create or Update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['about_entry_action'])) {
+// Handle embedded image uploads
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['type'] === 'embedded') {
     try {
         if (!validateCSRFToken($_POST['csrf_token'] ?? '')) throw new Exception('Invalid security token.');
-        $title = sanitizeInput($_POST['title'] ?? '');
-        $content = sanitizeInput($_POST['content'] ?? '');
-        if (empty($title) || empty($content)) throw new Exception('Title and content are required.');
-        $image = null;
-        if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $upload_errors = validateImageFile($_FILES['image']);
-            if (!empty($upload_errors)) throw new Exception(implode(', ', $upload_errors));
-            ensureUploadDirectory('../uploads/');
-            $image = generateSecureFilename($_FILES['image']['name']);
-            $target = '../uploads/' . $image;
-            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) throw new Exception('Failed to save uploaded image.');
-        }
-        if (isset($_POST['id']) && $_POST['id']) {
-            // Update
-            $id = intval($_POST['id']);
-            $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === 'true';
-            $stmt = $conn->prepare('SELECT image FROM about WHERE id=?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $current_image = null;
-            if ($row = $result->fetch_assoc()) $current_image = $row['image'];
-            $stmt->close();
-            if ($remove_image || $image) {
-                if ($current_image) safeDeleteFile('../uploads/' . $current_image);
-            }
-            if ($remove_image) {
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=NULL WHERE id=?');
-                $stmt->bind_param('ssi', $title, $content, $id);
-            } elseif ($image) {
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=?, image=? WHERE id=?');
-                $stmt->bind_param('sssi', $title, $content, $image, $id);
-            } else {
-                $stmt = $conn->prepare('UPDATE about SET title=?, content=? WHERE id=?');
-                $stmt->bind_param('ssi', $title, $content, $id);
-            }
-            if (!$stmt->execute()) throw new Exception('Update failed: ' . $stmt->error);
-            $stmt->close();
-            redirectWithMessage($_SERVER['PHP_SELF'], 'About entry updated successfully!', 'success');
-        } else {
-            // Create
-            $stmt = $conn->prepare('INSERT INTO about (title, content, image) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $title, $content, $image);
-            if (!$stmt->execute()) throw new Exception('Error: ' . $stmt->error);
-            $stmt->close();
-            redirectWithMessage($_SERVER['PHP_SELF'], 'About entry added successfully!', 'success');
-        }
-    } catch (Exception $e) {
-        logError('About entry form error: ' . $e->getMessage(), $_POST);
-        redirectWithMessage($_SERVER['PHP_SELF'], $e->getMessage(), 'error');
-    }
-}
-
-// Handle Developer Management Operations
-if (isset($_POST['developer_action'])) {
-    $action = $_POST['developer_action'];
-    
-    if ($action === 'create' || $action === 'update') {
-        $name = sanitizeInput($_POST['developer_name'] ?? '');
-        $position = sanitizeInput($_POST['developer_position'] ?? '');
+        
+        $image_type = trim($_POST['image_type']);
         $image = null;
         
-        // Handle image upload
-        if (isset($_FILES['developer_image']) && $_FILES['developer_image']['error'] === UPLOAD_ERR_OK) {
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            $file_type = $_FILES['developer_image']['type'];
+            $file_type = $_FILES['image']['type'];
             
             if (!in_array($file_type, $allowed_types)) {
                 throw new Exception('Please select a valid image file (JPEG, PNG, GIF, WebP)');
             }
             
             ensureUploadDirectory('../uploads/');
-            $image = generateSecureFilename($_FILES['developer_image']['name']);
+            $image = generateSecureFilename($_FILES['image']['name']);
             $target = '../uploads/' . $image;
             
-            if (!move_uploaded_file($_FILES['developer_image']['tmp_name'], $target)) {
+            if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
                 throw new Exception('Failed to save uploaded image.');
             }
         }
         
-        if ($action === 'update' && isset($_POST['developer_id'])) {
-            // Update developer
-            $id = intval($_POST['developer_id']);
-            $remove_image = isset($_POST['remove_developer_image']) && $_POST['remove_developer_image'] === 'true';
-            
-            // Get current image
-            $stmt = $conn->prepare('SELECT image FROM about_developers WHERE id=?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $current_image = null;
-            if ($row = $result->fetch_assoc()) {
-                $current_image = $row['image'];
-            }
-            $stmt->close();
-            
-            if ($remove_image) {
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    safeDeleteFile('../uploads/' . $current_image);
+        if ($image) {
+            if (isset($_POST['id']) && $_POST['id']) {
+                // Update existing image
+                $id = intval($_POST['id']);
+                $stmt = $conn->prepare('SELECT image FROM about WHERE id = ?');
+                if ($stmt) {
+                    $stmt->bind_param('i', $id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $current_image = null;
+                    if ($row = $result->fetch_assoc()) {
+                        $current_image = $row['image'];
+                    }
+                    $stmt->close();
+                    
+                    if ($current_image && file_exists('../uploads/' . $current_image)) {
+                        unlink('../uploads/' . $current_image);
+                    }
+                    
+                    $stmt = $conn->prepare('UPDATE about SET image = ? WHERE id = ?');
+                    if ($stmt) {
+                        $stmt->bind_param('si', $image, $id);
+                        if ($stmt->execute()) {
+                            redirectWithMessage($_SERVER['PHP_SELF'], 'Embedded image updated successfully!', 'success');
+                        } else {
+                            $message = 'Update failed: ' . $stmt->error;
+                        }
+                        $stmt->close();
+                    }
                 }
-                $stmt = $conn->prepare('UPDATE about_developers SET name=?, position=?, image=NULL WHERE id=?');
-                $stmt->bind_param('ssi', $name, $position, $id);
-            } else if ($image) {
-                if ($current_image && file_exists('../uploads/' . $current_image)) {
-                    safeDeleteFile('../uploads/' . $current_image);
-                }
-                $stmt = $conn->prepare('UPDATE about_developers SET name=?, position=?, image=? WHERE id=?');
-                $stmt->bind_param('sssi', $name, $position, $image, $id);
             } else {
-                $stmt = $conn->prepare('UPDATE about_developers SET name=?, position=? WHERE id=?');
-                $stmt->bind_param('ssi', $name, $position, $id);
+                // Create new embedded image entry
+                $title = ucfirst(str_replace('_', ' ', $image_type)) . ' Image';
+                $content = 'Embedded image for ' . $image_type;
+                $category = 'embedded';
+                $section = $image_type;
+                
+                $stmt = $conn->prepare('INSERT INTO about (title, content, image) VALUES (?, ?, ?)');
+                if ($stmt) {
+                    $stmt->bind_param('sss', $title, $content, $image);
+                    if ($stmt->execute()) {
+                        redirectWithMessage($_SERVER['PHP_SELF'], 'Embedded image uploaded successfully!', 'success');
+                    } else {
+                        $message = 'Error: ' . $stmt->error;
+                    }
+                    $stmt->close();
+                } else {
+                    $message = 'Error preparing statement: ' . $conn->error;
+                }
             }
-            
-            if (!$stmt->execute()) {
-                throw new Exception('Developer update failed: ' . $stmt->error);
-            }
-            $stmt->close();
-            redirectWithMessage($_SERVER['PHP_SELF'], 'Developer updated successfully!', 'success');
         } else {
-            // Create new developer
-            $stmt = $conn->prepare('INSERT INTO about_developers (name, position, image) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $name, $position, $image);
-            if (!$stmt->execute()) {
-                throw new Exception('Error: ' . $stmt->error);
-            }
-            $stmt->close();
-            redirectWithMessage($_SERVER['PHP_SELF'], 'Developer added successfully!', 'success');
+            $message = 'Please select a valid image file.';
         }
-    } else if ($action === 'delete' && isset($_POST['developer_id'])) {
-        // Delete developer
-        $id = intval($_POST['developer_id']);
-        
-        // Get image before deletion
-        $stmt = $conn->prepare('SELECT image FROM about_developers WHERE id=?');
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($row['image'] && file_exists('../uploads/' . $row['image'])) {
-                safeDeleteFile('../uploads/' . $row['image']);
-            }
-        }
-        $stmt->close();
-        
-        $stmt = $conn->prepare('DELETE FROM about_developers WHERE id=?');
-        $stmt->bind_param('i', $id);
-        if (!$stmt->execute()) {
-            throw new Exception('Developer delete failed: ' . $stmt->error);
-        }
-        $stmt->close();
-        redirectWithMessage($_SERVER['PHP_SELF'], 'Developer deleted successfully!', 'success');
-    } else if ($action === 'reorder') {
-        // Handle drag and drop reordering
-        $order_data = json_decode($_POST['order_data'], true);
-        if ($order_data) {
-            foreach ($order_data as $index => $id) {
-                $stmt = $conn->prepare('UPDATE about_developers SET display_order=? WHERE id=?');
-                $stmt->bind_param('ii', $index, $id);
-                if (!$stmt->execute()) {
-                    throw new Exception('Developer reorder failed: ' . $stmt->error);
-                }
-                $stmt->close();
-            }
-            echo json_encode(['success' => true]);
-            exit();
-        }
-    }
-}
-
-// Handle Content Order Management Operations
-if (isset($_POST['content_order_action'])) {
-    $action = $_POST['content_order_action'];
-    
-    if ($action === 'add') {
-        $content_type = sanitizeInput($_POST['content_type'] ?? '');
-        $content_id = intval($_POST['content_id'] ?? 0);
-        
-        if ($content_type === '' || $content_id === 0) {
-            throw new Exception('Invalid content type or ID.');
-        }
-
-        // Get the next display order
-        $max_order = $conn->query('SELECT MAX(display_order) as max_order FROM about_content_order');
-        $max_order_result = $max_order->fetch_assoc();
-        $next_order = ($max_order_result['max_order'] ?? -1) + 1;
-        
-        $stmt = $conn->prepare('INSERT INTO about_content_order (content_type, content_id, display_order) VALUES (?, ?, ?)');
-        $stmt->bind_param('ssi', $content_type, $content_id, $next_order);
-        if (!$stmt->execute()) {
-            throw new Exception('Content order add failed: ' . $stmt->error);
-        }
-        $stmt->close();
-        redirectWithMessage($_SERVER['PHP_SELF'], 'Content added to layout successfully!', 'success');
-    } else if ($action === 'remove') {
-        $content_type = sanitizeInput($_POST['content_type'] ?? '');
-        $content_id = intval($_POST['content_id'] ?? 0);
-        
-        if ($content_type === '' || $content_id === 0) {
-            throw new Exception('Invalid content type or ID.');
-        }
-
-        $stmt = $conn->prepare('DELETE FROM about_content_order WHERE content_type = ? AND content_id = ?');
-        $stmt->bind_param('ss', $content_type, $content_id);
-        if (!$stmt->execute()) {
-            throw new Exception('Content order remove failed: ' . $stmt->error);
-        }
-        $stmt->close();
-        redirectWithMessage($_SERVER['PHP_SELF'], 'Content removed from layout successfully!', 'success');
-    } else if ($action === 'reorder') {
-        $order_data = json_decode($_POST['order_data'], true);
-        if ($order_data) {
-            foreach ($order_data as $index => $item) {
-                $stmt = $conn->prepare('UPDATE about_content_order SET display_order = ? WHERE content_type = ? AND content_id = ?');
-                $stmt->bind_param('iss', $index, $item['type'], $item['id']);
-                if (!$stmt->execute()) {
-                    throw new Exception('Content order reorder failed: ' . $stmt->error);
-                }
-                $stmt->close();
-            }
-            echo json_encode(['success' => true]);
-            exit();
-        }
+    } catch (Exception $e) {
+        logError('Embedded image upload error: ' . $e->getMessage(), $_POST);
+        redirectWithMessage($_SERVER['PHP_SELF'], $e->getMessage(), 'error');
     }
 }
 
@@ -263,50 +95,12 @@ if (isset($_POST['content_order_action'])) {
 if (isset($_GET['msg'])) {
     switch($_GET['msg']) {
         case 'added':
-            $message = 'About entry added successfully!';
-            $action_type = 'create';
+            $message = 'Embedded image uploaded successfully!';
             $message_type = 'success';
             $message_icon = 'fa-check-circle';
             break;
         case 'updated':
-            $message = 'About entry updated successfully!';
-            $action_type = 'update';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'deleted':
-            $message = 'About entry deleted successfully!';
-            $action_type = 'delete';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'developer_added':
-            $message = 'Developer added successfully!';
-            $action_type = 'create';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'developer_updated':
-            $message = 'Developer updated successfully!';
-            $action_type = 'update';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'developer_deleted':
-            $message = 'Developer deleted successfully!';
-            $action_type = 'delete';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'content_added':
-            $message = 'Content added to layout successfully!';
-            $action_type = 'create';
-            $message_type = 'success';
-            $message_icon = 'fa-check-circle';
-            break;
-        case 'content_removed':
-            $message = 'Content removed from layout successfully!';
-            $action_type = 'delete';
+            $message = 'Embedded image updated successfully!';
             $message_type = 'success';
             $message_icon = 'fa-check-circle';
             break;
@@ -329,12 +123,6 @@ if (strpos($message, 'Error') === 0 || strpos($message, 'failed') !== false) {
     $message_icon = 'fa-exclamation-triangle';
 }
 
-// Fetch all entries
-$entries = $conn->query('SELECT * FROM about ORDER BY created_at DESC');
-
-// Fetch all developer entries
-$developer_entries = $conn->query('SELECT * FROM about_developers ORDER BY display_order ASC, created_at DESC');
-
 // Get current page for active state
 $current_page = 'about';
 ?>
@@ -343,7 +131,7 @@ $current_page = 'about';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - About</title>
+    <title>Admin - About Embedded Images</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script>
@@ -360,280 +148,177 @@ $current_page = 'about';
             <?php endif; ?>
         </div>
         
-        <h1>About Management</h1>
-        <button class="stat-link" id="openCreateModal">
-            <i class="fas fa-plus"></i> Create New About Entry
-        </button>
+        <h1>About Page - Embedded Images Management</h1>
+        <p class="section-description">Upload or replace images that appear embedded within the About page content. These images are part of the static content and are not managed as posts.</p>
 
-        <button class="stat-link" id="openDeveloperModal">
-            <i class="fas fa-user-plus"></i> Add New Developer
-        </button>
-        
-        <div class="all-posts-container" id="allPostsContainer">
-            <?php if ($entries && $entries->num_rows > 0): ?>
-                <?php $entryCount = 1; ?>
-                <?php while ($row = $entries->fetch_assoc()): ?>
-                    <div class="post-row entry<?= $entryCount ?>" data-post-id="<?= e($row['id']) ?>">
-                        <?php if ($row['image']): ?>
-                            <img class="pic<?= $entryCount ?>" src="../uploads/<?= e($row['image']) ?>" alt="<?= e($row['title']) ?>">
-                        <?php endif; ?>
-                        <div class="entry-content">
-                            <div class="entry-title"><?= e($row['title']) ?></div>
-                            <div class="entry-text">
-                                <?php
-                                $content = strip_tags($row['content']);
-                                $truncated = mb_substr($content, 0, 105);
-                                if (mb_strlen($content) > 105) {
-                                    $truncated .= '...';
-                                }
-                                echo e($truncated);
-                                ?>
-                            </div>
-                        </div>
-                        <div class="post-actions">
-                            <button class="edit-btn" data-id="<?= e($row['id']) ?>" data-title="<?= e($row['title']) ?>" data-content="<?= e($row['content']) ?>" data-image="<?= e($row['image']) ?>">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="delete-btn" data-id="<?= e($row['id']) ?>" data-title="<?= e($row['title']) ?>">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                    <?php $entryCount++; ?>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <div class="no-posts">
-                    <i class="fas fa-info-circle"></i>
-                    <p>No about entries found. Start by creating your first entry!</p>
-                    <button class="stat-link" id="openCreateModalEmpty">
-                        <i class="fas fa-plus"></i> Create Your First Entry
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
-
-            <!-- Developer Management Section -->
-            <div class="section-divider">
-            <h2>Developer Team Management</h2>
-            <p>Manage the developer team that appears on the About page. Drag and drop to reorder.</p>
-        </div>
-
-        <div class="developers-container" id="developersContainer">
-            <?php if ($developer_entries && $developer_entries->num_rows > 0): ?>
-                <div class="developers-list" id="developersList">
-                    <?php while ($row = $developer_entries->fetch_assoc()): ?>
-                        <div class="developer-item" data-id="<?= e($row['id']) ?>" data-order="<?= e($row['display_order']) ?>">
-                            <div class="drag-handle">
-                                <i class="fas fa-grip-vertical"></i>
-                            </div>
-                            <?php if ($row['image']): ?>
-                                <img src="../uploads/<?= e($row['image']) ?>" alt="<?= e($row['name']) ?>">
-                            <?php else: ?>
-                                <div class="no-image">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            <?php endif; ?>
-                            <div class="developer-info">
-                                <span class="developer-name"><?= e($row['name']) ?></span>
-                                <span class="developer-position"><?= e($row['position']) ?></span>
-                            </div>
-                            <div class="developer-actions">
-                                <button class="edit-developer-btn" data-id="<?= e($row['id']) ?>" 
-                                    data-name="<?= e($row['name']) ?>" 
-                                    data-position="<?= e($row['position']) ?>" 
-                                    data-image="<?= e($row['image'] ?? '') ?>">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-developer-btn" data-id="<?= e($row['id']) ?>" data-name="<?= e($row['name']) ?>">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                </div>
-            <?php else: ?>
-                <div class="no-developers">
-                    <i class="fas fa-users"></i>
-                    <p>No developers added yet. Start by adding your first team member!</p>
-                    <button class="stat-link" id="openDeveloperModalEmpty">
-                        <i class="fas fa-user-plus"></i> Add Your First Developer
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
-        
-        <!-- Content Order Management Section -->
-        <div class="section-divider">
-            <h2>Content Order Management</h2>
-            <p>Drag and drop to reorder how content appears on the About page. Posts and Developer sections can be mixed.</p>
-        </div>
-        
-        <div class="content-order-container" id="contentOrderContainer">
-            <?php
-            // Get current content order
-            $content_order = $conn->query('SELECT * FROM about_content_order ORDER BY display_order ASC');
-            $ordered_items = [];
-
-            if ($content_order && $content_order->num_rows > 0) {
-                while ($order_row = $content_order->fetch_assoc()) {
-                    if ($order_row['content_type'] === 'post') {
-                        $post_id = intval($order_row['content_id']);
-                        $post_query = $conn->prepare('SELECT * FROM about WHERE id = ?');
-                        if ($post_query) {
-                            $post_query->bind_param('i', $post_id);
-                            $post_query->execute();
-                            $post_result = $post_query->get_result();
-                            if ($post_result->num_rows > 0) {
-                                $ordered_items[] = [
-                                    'type' => 'post',
-                                    'id' => $order_row['content_id'],
-                                    'data' => $post_result->fetch_assoc()
-                                ];
-                            }
-                            $post_query->close();
-                        }
-                    } elseif ($order_row['content_type'] === 'developers') {
-                        $ordered_items[] = [
-                            'type' => 'developers',
-                            'id' => 'developers',
-                            'data' => ['title' => 'Developer Team Section']
-                        ];
-                    }
-                }
-            }
+        <div class="embedded-images-section">
+            <h3>Manage Embedded Images</h3>
+            <p>Upload or replace images that appear in the About page content.</p>
             
-            if (!empty($ordered_items)):
-            ?>
-            <div class="content-order-list" id="contentOrderList">
-                <?php foreach ($ordered_items as $item): ?>
-                    <div class="content-order-item" data-type="<?= e($item['type']) ?>" data-id="<?= e($item['id']) ?>" draggable="true">
-                        <div class="drag-handle">
-                            <i class="fas fa-grip-vertical"></i>
-                        </div>
-                        <div class="content-info">
-                            <?php if ($item['type'] === 'post'): ?>
-                                <?php $img = $item['data']['image'] ?? null; ?>
-                                <?php if ($img): ?>
-                                    <img src="../uploads/<?= e($img) ?>" alt="<?= e($item['data']['title']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
-                                <?php endif; ?>
-                                <span class="content-type">Post</span>
-                                <span class="content-title"><?= e($item['data']['title']) ?></span>
-                            <?php else: ?>
-                                <img src="../assets/images/code.png" alt="Developers" style="width:40px;height:40px;object-fit:cover;border-radius:5px;margin-right:10px;">
-                                <span class="content-type">Developer Section</span>
-                                <span class="content-title"><?= e($item['data']['title']) ?></span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="content-actions">
-                            <button class="remove-content-btn" data-type="<?= e($item['type']) ?>" data-id="<?= e($item['id']) ?>">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+            <div class="embedded-images-grid">
+                <!-- Hero Image -->
+                <div class="embedded-image-card">
+                    <h4>Hero Image (BLEZY.png)</h4>
+                    <div class="image-upload-area" data-image-type="hero">
+                        <?php
+                        $hero_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "hero" LIMIT 1');
+                        if ($hero_image && $hero_image->num_rows > 0) {
+                            $hero = $hero_image->fetch_assoc();
+                        ?>
+                            <div class="current-image">
+                                <img src="../uploads/<?= htmlspecialchars($hero['image']) ?>" alt="Hero Image">
+                                <button class="replace-image-btn" data-image-type="hero" data-image-id="<?= $hero['id'] ?>">
+                                    <i class="fas fa-sync-alt"></i> Replace
+                                </button>
+                            </div>
+                        <?php } else { ?>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>No image uploaded</p>
+                                <button class="upload-image-btn" data-image-type="hero">
+                                    <i class="fas fa-plus"></i> Upload Image
+                                </button>
+                            </div>
+                        <?php } ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
-            <?php else: ?>
-            <div class="no-content-order">
-                <i class="fas fa-info-circle"></i>
-                <p>No content order set. Add posts and developers to create the page layout.</p>
-            </div>
-            <?php endif; ?>
-        </div>
-        
-        <!-- Available Content Section -->
-        <div class="section-divider">
-            <h2>Available Content</h2>
-            <p>Add content to the About page layout.</p>
-        </div>
-        
-        <!-- Available Posts -->
-        <div class="available-content-section">
-            <h3>Available Posts</h3>
-            <div class="available-posts">
-                <?php
-                $all_posts = $conn->query('SELECT * FROM about ORDER BY created_at DESC');
-                if ($all_posts && $all_posts->num_rows > 0):
-                    while ($post = $all_posts->fetch_assoc()):
-                        // Check if post is already in order
-                        $in_order = $conn->prepare('SELECT id FROM about_content_order WHERE content_type = "post" AND content_id = ?');
-                        $in_order->bind_param('i', $post['id']);
-                        $in_order->execute();
-                        $in_order_result = $in_order->get_result();
-                        $is_ordered = $in_order_result->num_rows > 0;
-                        $in_order->close();
-                        
-                        if (!$is_ordered):
-                ?>
-                <div class="available-item" data-type="post" data-id="<?= e($post['id']) ?>">
-                    <div class="item-info">
-                        <span class="item-title"><?= e($post['title']) ?></span>
-
-                    </div>
-                    <button class="add-content-btn" data-type="post" data-id="<?= e($post['id']) ?>" data-title="<?= e($post['title']) ?>">
-                        <i class="fas fa-plus"></i> Add to Layout
-                    </button>
                 </div>
-                <?php 
-                        endif;
-                    endwhile;
-                endif;
-                ?>
-            </div>
-        </div>
-        
-        <!-- Available Developer Section -->
-        <div class="available-content-section">
-            <h3>Developer Section</h3>
-            <div class="available-developers">
-                <?php
-                $dev_in_order = $conn->prepare('SELECT id FROM about_content_order WHERE content_type = "developers"');
-                $dev_in_order->execute();
-                $dev_in_order_result = $dev_in_order->get_result();
-                $dev_is_ordered = $dev_in_order_result->num_rows > 0;
-                $dev_in_order->close();
-                
-                if (!$dev_is_ordered):
-                ?>
-                <div class="available-item" data-type="developers" data-id="developers">
-                    <div class="item-info">
+
+                <!-- Poster Image -->
+                <div class="embedded-image-card">
+                    <h4>Poster Image (blezy what cs.jpg)</h4>
+                    <div class="image-upload-area" data-image-type="poster">
+                        <?php
+                        $poster_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "poster" LIMIT 1');
+                        if ($poster_image && $poster_image->num_rows > 0) {
+                            $poster = $poster_image->fetch_assoc();
+                        ?>
+                            <div class="current-image">
+                                <img src="../uploads/<?= htmlspecialchars($poster['image']) ?>" alt="Poster Image">
+                                <button class="replace-image-btn" data-image-type="poster" data-image-id="<?= $poster['id'] ?>">
+                                    <i class="fas fa-sync-alt"></i> Replace
+                                </button>
+                            </div>
+                        <?php } else { ?>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>No image uploaded</p>
+                                <button class="upload-image-btn" data-image-type="poster">
+                                    <i class="fas fa-plus"></i> Upload Image
+                                </button>
+                            </div>
+                        <?php } ?>
                     </div>
-                    <button class="add-content-btn" data-type="developers" data-id="developers" data-title="Developer Team Section">
-                        <i class="fas fa-plus"></i> Add to Layout
-                    </button>
                 </div>
-                <?php endif; ?>
+
+                <!-- BSCS Image -->
+                <div class="embedded-image-card">
+                    <h4>BSCS Section Image (what is BSCS.jpg)</h4>
+                    <div class="image-upload-area" data-image-type="bscs">
+                        <?php
+                        $bscs_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "bscs" LIMIT 1');
+                        if ($bscs_image && $bscs_image->num_rows > 0) {
+                            $bscs = $bscs_image->fetch_assoc();
+                        ?>
+                            <div class="current-image">
+                                <img src="../uploads/<?= htmlspecialchars($bscs['image']) ?>" alt="BSCS Image">
+                                <button class="replace-image-btn" data-image-type="bscs" data-image-id="<?= $bscs['id'] ?>">
+                                    <i class="fas fa-sync-alt"></i> Replace
+                                </button>
+                            </div>
+                        <?php } else { ?>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>No image uploaded</p>
+                                <button class="upload-image-btn" data-image-type="bscs">
+                                    <i class="fas fa-plus"></i> Upload Image
+                                </button>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+
+                <!-- Enrollment Image -->
+                <div class="embedded-image-card">
+                    <h4>Enrollment Section Image (enrollment.jpg)</h4>
+                    <div class="image-upload-area" data-image-type="enrollment">
+                        <?php
+                        $enrollment_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "enrollment" LIMIT 1');
+                        if ($enrollment_image && $enrollment_image->num_rows > 0) {
+                            $enrollment = $enrollment_image->fetch_assoc();
+                        ?>
+                            <div class="current-image">
+                                <img src="../uploads/<?= htmlspecialchars($enrollment['image']) ?>" alt="Enrollment Image">
+                                <button class="replace-image-btn" data-image-type="enrollment" data-image-id="<?= $enrollment['id'] ?>">
+                                    <i class="fas fa-sync-alt"></i> Replace
+                                </button>
+                            </div>
+                        <?php } else { ?>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>No image uploaded</p>
+                                <button class="upload-image-btn" data-image-type="enrollment">
+                                    <i class="fas fa-plus"></i> Upload Image
+                                </button>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+
+                <!-- Edusuite Image -->
+                <div class="embedded-image-card">
+                    <h4>Edusuite Section Image (edusuite.png)</h4>
+                    <div class="image-upload-area" data-image-type="edusuite">
+                        <?php
+                        $edusuite_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "edusuite" LIMIT 1');
+                        if ($edusuite_image && $edusuite_image->num_rows > 0) {
+                            $edusuite = $edusuite_image->fetch_assoc();
+                        ?>
+                            <div class="current-image">
+                                <img src="../uploads/<?= htmlspecialchars($edusuite['image']) ?>" alt="Edusuite Image">
+                                <button class="replace-image-btn" data-image-type="edusuite" data-image-id="<?= $edusuite['id'] ?>">
+                                    <i class="fas fa-sync-alt"></i> Replace
+                                </button>
+                            </div>
+                        <?php } else { ?>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>No image uploaded</p>
+                                <button class="upload-image-btn" data-image-type="edusuite">
+                                    <i class="fas fa-plus"></i> Upload Image
+                                </button>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
             </div>
         </div>
-        
 
-        
-        <!-- Modal Container -->
-        <div id="blogModalContainer"></div>
-
-        <!-- Image Preview Modal -->
-        <div id="imagePreviewModal" class="image-preview-modal">
-            <div class="image-preview-modal-content">
-                <button type="button" class="close-preview">&times;</button>
-                <img src="" alt="Image Preview">
+        <!-- Image Upload Modal -->
+        <div id="imageUploadModal" class="modal">
+            <div class="modal-content">
+                <button type="button" class="close-modal">&times;</button>
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Embedded Image</h2>
+                <form id="imageUploadForm" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?= e(generateCSRFToken()) ?>">
+                    <input type="hidden" name="type" value="embedded">
+                    <input type="hidden" name="image_type" id="modalImageType">
+                    <input type="hidden" name="id" id="modalImageId">
+                    
+                    <div class="form-group">
+                        <label for="imageFile"><i class="fas fa-image"></i> Select Image</label>
+                        <input type="file" id="imageFile" name="image" accept="image/*" required>
+                        <p class="help-text">Supported formats: JPEG, PNG, GIF, WebP (Max 5MB)</p>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-    // Use IIFE to prevent global variable conflicts and multiple initializations
-    (function() {
-        'use strict';
-        
-        // Prevent multiple initializations
-        if (window.aboutManagerInitialized) {
-            return;
-        }
-        window.aboutManagerInitialized = true;
-
-        const modalContainer = document.getElementById('blogModalContainer');
-        let currentModal = null;
-        let isModalOpen = false;
-
         // Popup message auto-hide
         const popup = document.getElementById('popupMessage');
         if (popup && popup.textContent.trim() !== '') {
@@ -642,868 +327,43 @@ $current_page = 'about';
             }, 3000);
         }
 
-        // Prevent body scroll when modal is open
-        function toggleBodyScroll(disable) {
-            document.body.style.overflow = disable ? 'hidden' : '';
-        }
+        // Modal functionality
+        const modal = document.getElementById('imageUploadModal');
+        const closeModal = document.querySelector('.close-modal');
+        const uploadBtns = document.querySelectorAll('.upload-image-btn, .replace-image-btn');
 
-        // Open Create Modal
-        const openCreateModalBtn = document.getElementById('openCreateModal');
-        if (openCreateModalBtn) {
-            openCreateModalBtn.addEventListener('click', function(e) {
+        // Open modal
+        uploadBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                openModal('create');
-            });
-        }
-
-        // Add click handler for empty state create button
-        const openCreateModalEmptyBtn = document.getElementById('openCreateModalEmpty');
-        if (openCreateModalEmptyBtn) {
-            openCreateModalEmptyBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                openModal('create');
-            });
-        }
-
-        // Developer Management Event Handlers
-        const openDeveloperModalBtn = document.getElementById('openDeveloperModal');
-        if (openDeveloperModalBtn) {
-            openDeveloperModalBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                openDeveloperModal('create');
-            });
-        }
-
-        const openDeveloperModalEmptyBtn = document.getElementById('openDeveloperModalEmpty');
-        if (openDeveloperModalEmptyBtn) {
-            openDeveloperModalEmptyBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                openDeveloperModal('create');
-            });
-        }
-
-        // Event delegation for edit and delete buttons
-        document.addEventListener('click', function(e) {
-            // Edit button handler
-            if (e.target.closest('.edit-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.edit-btn');
-                const postData = {
-                    id: btn.getAttribute('data-id'),
-                    title: btn.getAttribute('data-title'),
-                    content: btn.getAttribute('data-content'),
-                    image: btn.getAttribute('data-image')
-                };
-                openModal('edit', postData);
-                return;
-            }
-            
-            // Delete button handler
-            if (e.target.closest('.delete-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.delete-btn');
-                const postData = {
-                    id: btn.getAttribute('data-id'),
-                    title: btn.getAttribute('data-title')
-                };
-                openModal('delete', postData);
-                return;
-            }
-            
-            // Developer edit button handler
-            if (e.target.closest('.edit-developer-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.edit-developer-btn');
-                const developerData = {
-                    id: btn.getAttribute('data-id'),
-                    name: btn.getAttribute('data-name'),
-                    position: btn.getAttribute('data-position'),
-                    image: btn.getAttribute('data-image')
-                };
-                openDeveloperModal('edit', developerData);
-                return;
-            }
-            
-            // Developer delete button handler
-            if (e.target.closest('.delete-developer-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.delete-developer-btn');
-                const developerData = {
-                    id: btn.getAttribute('data-id'),
-                    name: btn.getAttribute('data-name')
-                };
-                openDeveloperModal('delete', developerData);
-                return;
-            }
-            
-            // Content order add button handler
-            if (e.target.closest('.add-content-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.add-content-btn');
-                const contentData = {
-                    type: btn.getAttribute('data-type'),
-                    id: btn.getAttribute('data-id'),
-                    title: btn.getAttribute('data-title')
-                };
-                addContentToOrder(contentData);
-                return;
-            }
-            
-            // Content order remove button handler
-            if (e.target.closest('.remove-content-btn')) {
-                e.preventDefault();
-                const btn = e.target.closest('.remove-content-btn');
-                const contentData = {
-                    type: btn.getAttribute('data-type'),
-                    id: btn.getAttribute('data-id')
-                };
-                removeContentFromOrder(contentData);
-                return;
-            }
-            
-            // Close modal handler
-            if (e.target.classList.contains('close-modal')) {
-                e.preventDefault();
-                closeModal();
-                return;
-            }
-
-            // Close modal on outside click
-            if (e.target.classList.contains('modal') && isModalOpen) {
-                closeModal();
-                return;
-            }
-        });
-
-        // Close modal on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && isModalOpen) {
-                closeModal();
-            }
-        });
-
-        function openModal(type, data = null) {
-            if (isModalOpen) return;
-            
-            let modalHTML = '';
-            
-            if (type === 'create') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-plus-circle"></i> Create About Entry</h2>
-                        <form id="createPostForm" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="csrf_token" value="${csrfToken}">
-                            <input type="hidden" name="about_entry_action" value="create">
-                            <div class="form-group">
-                                <label for="createTitle"><i class="fas fa-heading"></i> Title</label>
-                                <input type="text" id="createTitle" name="title" placeholder="Enter entry title" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="createContent"><i class="fas fa-align-left"></i> Content</label>
-                                <textarea id="createContent" name="content" placeholder="Write your entry content here..." required></textarea>
-                            </div>
-                            <div class="custom-file">
-                                <label><i class="fas fa-image"></i> Featured Image</label>
-                                <label class="file-input-label" for="createImage">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <span>Click to upload image</span>
-                                </label>
-                                <input type="file" name="image" id="createImage" accept="image/*">
-                            </div>
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-plus"></i> Create Entry
-                            </button>
-                        </form>
-                    </div>
-                </div>`;
-            } 
-            else if (type === 'edit') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-edit"></i> Edit About Entry</h2>
-                        <form id="editPostForm" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="csrf_token" value="${csrfToken}">
-                            <input type="hidden" name="about_entry_action" value="update">
-                            <input type="hidden" name="id" value="${data.id}">
-                            <input type="hidden" name="remove_image" value="false" id="removeImageFlag">
-                            <div class="form-group">
-                                <label for="editTitle"><i class="fas fa-heading"></i> Title</label>
-                                <input type="text" id="editTitle" name="title" value="${data.title}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editContent"><i class="fas fa-align-left"></i> Content</label>
-                                <textarea id="editContent" name="content" required>${data.content}</textarea>
-                            </div>
-                            <div class="custom-file">
-                                <label><i class="fas fa-image"></i> Featured Image</label>
-                                <div id="existingImageContainer">
-                                    ${data.image ? `
-                                        <div class="img-preview-container show existing-image" data-image="${data.image}">
-                                            <div class="previewImageBlur">
-                                                <i class="fas fa-eye"></i>
-                                                <span>Preview image</span>
-                                            </div>
-                                            <img src="../uploads/${data.image}" alt="Current image">
-                                            <button type="button" class="remove-preview" title="Remove image">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                <label class="file-input-label" for="editImage">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <span>${data.image ? 'Change image' : 'Click to upload image'}</span>
-                                </label>
-                                <input type="file" name="image" id="editImage" accept="image/*">
-                            </div>
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                        </form>
-                    </div>
-                </div>`;
-            } 
-            else if (type === 'delete') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-trash-alt"></i> Delete About Entry</h2>
-                        <div class="delete-confirmation">
-                            <i class="fas fa-exclamation-triangle headTrash"></i>
-                            <p>Are you sure you want to delete "<strong>${data.title}</strong>"?</p>
-                            <p>This action cannot be undone.</p>
-                            <div class="delete-actions">
-                                <button type="button" class="deleting-btn" onclick="confirmDelete(${data.id})">
-                                    <i class="fas fa-trash btnTrash"></i> Delete Entry
-                                </button>
-                                <button type="button" class="cancel-btn" onclick="closeModal()">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }
-            
-            showModal(modalHTML);
-            
-            // Setup image preview after modal is shown
-            setTimeout(() => {
-                if (type === 'create') {
-                    setupImagePreview('createImage');
-                } else if (type === 'edit') {
-                    // Handle existing image removal
-                    const existingContainer = document.querySelector('#existingImageContainer .img-preview-container.existing-image');
-                    if (existingContainer) {
-                        handleExistingImageRemove(existingContainer);
-                    }
-                    
-                    // Setup new image preview
-                    setupImagePreview('editImage');
-                }
-            }, 100);
-        }
-
-        function showModal(html) {
-            modalContainer.innerHTML = html;
-            currentModal = modalContainer.querySelector('.modal');
-            isModalOpen = true;
-            
-            // Show modal with animation
-            setTimeout(() => {
-                currentModal.classList.add('show');
-                toggleBodyScroll(true);
-            }, 10);
-            
-            // Focus first input
-            const firstInput = currentModal.querySelector('input:not([type="hidden"]):not([type="file"]), textarea');
-            if (firstInput) {
-                setTimeout(() => firstInput.focus(), 300);
-            }
-        }
-
-        function closeModal() {
-            if (!currentModal || !isModalOpen) return;
-            
-            currentModal.classList.remove('show');
-            toggleBodyScroll(false);
-            
-            setTimeout(() => {
-                modalContainer.innerHTML = '';
-                currentModal = null;
-                isModalOpen = false;
-            }, 300);
-        }
-
-        // Developer Modal Functions
-        function openDeveloperModal(type, data = null) {
-            if (isModalOpen) return;
-            
-            let modalHTML = '';
-            
-            if (type === 'create') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-user-plus"></i> Add New Developer</h2>
-                        <form id="createDeveloperForm" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="csrf_token" value="${csrfToken}">
-                            <input type="hidden" name="developer_action" value="create">
-                            <div class="form-group">
-                                <label for="createDeveloperName"><i class="fas fa-user"></i> Name</label>
-                                <input type="text" id="createDeveloperName" name="developer_name" placeholder="Enter developer name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="createDeveloperPosition"><i class="fas fa-briefcase"></i> Position</label>
-                                <input type="text" id="createDeveloperPosition" name="developer_position" placeholder="Enter developer position" required>
-                            </div>
-                            <div class="custom-file">
-                                <label><i class="fas fa-image"></i> Profile Image</label>
-                                <label class="file-input-label" for="createDeveloperImage">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <span>Click to upload image</span>
-                                </label>
-                                <input type="file" name="developer_image" id="createDeveloperImage" accept="image/*">
-                            </div>
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-plus"></i> Add Developer
-                            </button>
-                        </form>
-                    </div>
-                </div>`;
-            } 
-            else if (type === 'edit') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-edit"></i> Edit Developer</h2>
-                        <form id="editDeveloperForm" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="csrf_token" value="${csrfToken}">
-                            <input type="hidden" name="developer_action" value="update">
-                            <input type="hidden" name="developer_id" value="${data.id}">
-                            <input type="hidden" name="remove_developer_image" value="false" id="removeDeveloperImageFlag">
-                            <div class="form-group">
-                                <label for="editDeveloperName"><i class="fas fa-user"></i> Name</label>
-                                <input type="text" id="editDeveloperName" name="developer_name" value="${data.name}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editDeveloperPosition"><i class="fas fa-briefcase"></i> Position</label>
-                                <input type="text" id="editDeveloperPosition" name="developer_position" value="${data.position}" required>
-                            </div>
-                            <div class="custom-file">
-                                <label><i class="fas fa-image"></i> Profile Image</label>
-                                <div id="existingDeveloperImageContainer">
-                                    ${data.image ? `
-                                        <div class="img-preview-container show existing-image" data-image="${data.image}">
-                                            <div class="previewImageBlur">
-                                                <i class="fas fa-eye"></i>
-                                                <span>Preview image</span>
-                                            </div>
-                                            <img src="../uploads/${data.image}" alt="Current image">
-                                            <button type="button" class="remove-preview" title="Remove image">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                <label class="file-input-label" for="editDeveloperImage">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <span>${data.image ? 'Change image' : 'Click to upload image'}</span>
-                                </label>
-                                <input type="file" name="developer_image" id="editDeveloperImage" accept="image/*">
-                            </div>
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                        </form>
-                    </div>
-                </div>`;
-            } 
-            else if (type === 'delete') {
-                modalHTML = `
-                <div class="modal">
-                    <div class="modal-content">
-                        <button type="button" class="close-modal">&times;</button>
-                        <h2><i class="fas fa-trash-alt"></i> Delete Developer</h2>
-                        <div class="delete-confirmation">
-                            <i class="fas fa-exclamation-triangle headTrash"></i>
-                            <p>Are you sure you want to delete "<strong>${data.name}</strong>"?</p>
-                            <p>This action cannot be undone.</p>
-                            <div class="delete-actions">
-                                <button type="button" class="deleting-btn" onclick="confirmDeveloperDelete(${data.id})">
-                                    <i class="fas fa-trash btnTrash"></i> Delete Developer
-                                </button>
-                                <button type="button" class="cancel-btn" onclick="closeModal()">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }
-            
-            showModal(modalHTML);
-            
-            // Setup image preview after modal is shown
-            setTimeout(() => {
-                if (type === 'create') {
-                    setupImagePreview('createDeveloperImage');
-                } else if (type === 'edit') {
-                    // Handle existing image removal
-                    const existingContainer = document.querySelector('#existingDeveloperImageContainer .img-preview-container.existing-image');
-                    if (existingContainer) {
-                        handleExistingImageRemove(existingContainer);
-                    }
-                    
-                    // Setup new image preview
-                    setupImagePreview('editDeveloperImage');
-                }
-            }, 100);
-        }
-
-        // Drag and Drop Functionality
-        function initializeDragAndDrop() {
-            const developersList = document.getElementById('developersList');
-            if (!developersList) return;
-
-            let draggedItem = null;
-
-            developersList.addEventListener('dragstart', function(e) {
-                if (e.target.closest('.developer-item')) {
-                    draggedItem = e.target.closest('.developer-item');
-                    e.target.closest('.developer-item').style.opacity = '0.5';
-                    e.dataTransfer.effectAllowed = 'move';
-                }
-            });
-
-            developersList.addEventListener('dragend', function(e) {
-                if (draggedItem) {
-                    draggedItem.style.opacity = '1';
-                    draggedItem = null;
-                }
-            });
-
-            developersList.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-
-            developersList.addEventListener('drop', function(e) {
-                e.preventDefault();
-                const targetItem = e.target.closest('.developer-item');
+                const imageType = this.getAttribute('data-image-type');
+                const imageId = this.getAttribute('data-image-id') || '';
                 
-                if (draggedItem && targetItem && draggedItem !== targetItem) {
-                    const allItems = Array.from(developersList.querySelectorAll('.developer-item'));
-                    const draggedIndex = allItems.indexOf(draggedItem);
-                    const targetIndex = allItems.indexOf(targetItem);
-                    
-                    if (draggedIndex < targetIndex) {
-                        targetItem.parentNode.insertBefore(draggedItem, targetItem.nextSibling);
-                    } else {
-                        targetItem.parentNode.insertBefore(draggedItem, targetItem);
-                    }
-                    
-                    // Save the new order
-                    saveDeveloperOrder();
-                }
+                document.getElementById('modalImageType').value = imageType;
+                document.getElementById('modalImageId').value = imageId;
+                
+                modal.classList.add('show');
             });
-        }
-
-        function saveDeveloperOrder() {
-            const developersList = document.getElementById('developersList');
-            if (!developersList) return;
-
-            const items = Array.from(developersList.querySelectorAll('.developer-item'));
-            const orderData = items.map(item => item.getAttribute('data-id'));
-
-            fetch(window.location.href, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `developer_action=reorder&order_data=${JSON.stringify(orderData)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const popup = document.getElementById('popupMessage');
-                    if (popup) {
-                        popup.textContent = 'Developer order updated successfully!';
-                        popup.className = 'popup-message show success';
-                        setTimeout(() => {
-                            popup.classList.remove('show');
-                        }, 3000);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error saving order:', error);
-            });
-        }
-
-        // Initialize drag and drop when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDragAndDrop();
-            initializeContentOrderDragAndDrop();
         });
 
-        // Content Order Functions
-        function initializeContentOrderDragAndDrop() {
-            const contentOrderList = document.getElementById('contentOrderList');
-            if (!contentOrderList) return;
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            modal.classList.remove('show');
+        });
 
-            let draggedItem = null;
-
-            contentOrderList.addEventListener('dragstart', function(e) {
-                if (e.target.closest('.content-order-item')) {
-                    draggedItem = e.target.closest('.content-order-item');
-                    e.target.closest('.content-order-item').style.opacity = '0.5';
-                    e.dataTransfer.effectAllowed = 'move';
-                }
-            });
-
-            contentOrderList.addEventListener('dragend', function(e) {
-                if (draggedItem) {
-                    draggedItem.style.opacity = '1';
-                    draggedItem = null;
-                }
-            });
-
-            contentOrderList.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-
-            contentOrderList.addEventListener('drop', function(e) {
-                e.preventDefault();
-                const targetItem = e.target.closest('.content-order-item');
-                
-                if (draggedItem && targetItem && draggedItem !== targetItem) {
-                    const allItems = Array.from(contentOrderList.querySelectorAll('.content-order-item'));
-                    const draggedIndex = allItems.indexOf(draggedItem);
-                    const targetIndex = allItems.indexOf(targetItem);
-                    
-                    if (draggedIndex < targetIndex) {
-                        targetItem.parentNode.insertBefore(draggedItem, targetItem.nextSibling);
-                    } else {
-                        targetItem.parentNode.insertBefore(draggedItem, targetItem);
-                    }
-                    
-                    // Save the new order
-                    saveContentOrder();
-                }
-            });
-        }
-
-        function saveContentOrder() {
-            const contentOrderList = document.getElementById('contentOrderList');
-            if (!contentOrderList) return;
-
-            const items = Array.from(contentOrderList.querySelectorAll('.content-order-item'));
-            const orderData = items.map(item => ({
-                type: item.getAttribute('data-type'),
-                id: item.getAttribute('data-id')
-            }));
-
-            fetch(window.location.href, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `content_order_action=reorder&order_data=${JSON.stringify(orderData)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const popup = document.getElementById('popupMessage');
-                    if (popup) {
-                        popup.textContent = 'Content order updated successfully!';
-                        popup.className = 'popup-message show success';
-                        setTimeout(() => {
-                            popup.classList.remove('show');
-                        }, 3000);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error saving content order:', error);
-            });
-        }
-
-        function addContentToOrder(contentData) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="csrf_token" value="${csrfToken}">
-                <input type="hidden" name="content_order_action" value="add">
-                <input type="hidden" name="content_type" value="${contentData.type}">
-                <input type="hidden" name="content_id" value="${contentData.id}">
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        function removeContentFromOrder(contentData) {
-            if (confirm(`Are you sure you want to remove "${contentData.type === 'post' ? contentData.id : 'Developer Section'}" from the layout?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.innerHTML = `
-                    <input type="hidden" name="csrf_token" value="${csrfToken}">
-                    <input type="hidden" name="content_order_action" value="remove">
-                    <input type="hidden" name="content_type" value="${contentData.type}">
-                    <input type="hidden" name="content_id" value="${contentData.id}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Make functions globally available
-        window.closeModal = closeModal;
-        window.openDeveloperModal = openDeveloperModal;
-        
-        window.confirmDelete = function(id) {
-            const deleteBtn = document.querySelector('.delete-actions .deleting-btn');
-            if (deleteBtn) {
-                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-                deleteBtn.disabled = true;
-            }
-            
-            // Redirect to delete
-            window.location.href = `?delete=${id}`;
-        };
-
-        window.confirmDeveloperDelete = function(id) {
-            const deleteBtn = document.querySelector('.delete-actions .deleting-btn');
-            if (deleteBtn) {
-                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-                deleteBtn.disabled = true;
-            }
-            
-            // Create form and submit
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="csrf_token" value="${csrfToken}">
-                <input type="hidden" name="developer_action" value="delete">
-                <input type="hidden" name="developer_id" value="${id}">
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        };
-
-        // Image Preview Modal functionality
-        const imagePreviewModal = document.getElementById('imagePreviewModal');
-        const modalImg = imagePreviewModal.querySelector('img');
-        const closePreviewBtn = imagePreviewModal.querySelector('.close-preview');
-        
-        // Function to show image preview modal
-        function showImagePreview(src) {
-            modalImg.src = src;
-            imagePreviewModal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Function to close image preview modal
-        function closeImagePreview() {
-            imagePreviewModal.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-        
-        // Close modal on button click
-        closePreviewBtn.addEventListener('click', closeImagePreview);
-        
         // Close modal on outside click
-        imagePreviewModal.addEventListener('click', function(e) {
-            if (e.target === imagePreviewModal) {
-                closeImagePreview();
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('show');
             }
         });
-        
+
         // Close modal on escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && imagePreviewModal.classList.contains('show')) {
-                closeImagePreview();
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                modal.classList.remove('show');
             }
         });
-        
-        // Handle existing images in edit mode
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.img-preview-container img') || e.target.closest('.previewImageBlur')) {
-                const container = e.target.closest('.img-preview-container');
-                const img = container.querySelector('img');
-                if (img && img.src) {
-                    showImagePreview(img.src);
-                }
-            }
-        });
-
-        // Fixed function to handle existing image removal
-        function handleExistingImageRemove(container) {
-            const removeBtn = container.querySelector('.remove-preview');
-            const removeImageFlag = document.getElementById('removeImageFlag');
-            
-            if (removeBtn) {
-                removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Set the remove_image flag to true for existing images
-                    if (removeImageFlag) {
-                        removeImageFlag.value = 'true';
-                    }
-                    
-                    // Remove the preview container with animation
-                    container.style.opacity = '0';
-                    container.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        if (container.parentNode) {
-                            container.remove();
-                        }
-                    }, 300);
-                });
-            }
-        }
-
-        // Updated setupImagePreview function with proper flag handling
-        function setupImagePreview(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            
-            const customFileDiv = input.closest('.custom-file');
-            const fileInputLabel = customFileDiv.querySelector('.file-input-label');
-            
-            // Remove any existing preview containers for new uploads
-            const existingPreviews = customFileDiv.querySelectorAll('.img-preview-container:not(.existing-image)');
-            existingPreviews.forEach(preview => preview.remove());
-            
-            // Remove existing event listeners by cloning the input
-            const newInput = input.cloneNode(true);
-            input.parentNode.replaceChild(newInput, input);
-            
-            // Create preview container function
-            function createPreviewContainer() {
-                const previewContainer = document.createElement('div');
-                previewContainer.className = 'img-preview-container new-image';
-                previewContainer.innerHTML = `
-                    <div class="previewImageBlur">
-                        <i class="fas fa-eye"></i>
-                        <span>Preview image</span>
-                    </div>
-                    <img src="" alt="Preview">
-                    <button type="button" class="remove-preview" title="Remove image">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                
-                // Insert before the file input label
-                customFileDiv.insertBefore(previewContainer, fileInputLabel);
-                
-                const previewImg = previewContainer.querySelector('img');
-                const blurOverlay = previewContainer.querySelector('.previewImageBlur');
-                const removeBtn = previewContainer.querySelector('.remove-preview');
-                
-                // Add click handlers for preview modal
-                [previewImg, blurOverlay].forEach(element => {
-                    element.addEventListener('click', function() {
-                        if (previewImg.src && previewImg.src !== '') {
-                            showImagePreview(previewImg.src);
-                        }
-                    });
-                });
-                
-                // Add remove button handler for new images
-                removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Clear the file input
-                    newInput.value = '';
-                    
-                    // If this is edit mode, handle the remove image flag properly
-                    if (inputId === 'editImage') {
-                        const removeImageFlag = document.getElementById('removeImageFlag');
-                        const existingContainer = document.querySelector('#existingImageContainer .existing-image');
-                        
-                        if (removeImageFlag && !existingContainer) {
-                            const editForm = document.getElementById('editPostForm');
-                            const originalImageData = editForm ? editForm.querySelector('input[name="id"]') : null;
-                            if (originalImageData) {
-                                // We're in edit mode and removing a new upload, keep existing remove flag state
-                            }
-                        }
-                    }
-                    
-                    // Remove with animation
-                    previewContainer.style.opacity = '0';
-                    previewContainer.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        if (previewContainer.parentNode) {
-                            previewContainer.remove();
-                        }
-                    }, 300);
-                });
-                
-                return { previewContainer, previewImg };
-            }
-            
-            // Add change event listener to the new input
-            newInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                
-                // Remove any existing preview containers for new uploads first
-                const existingPreviews = customFileDiv.querySelectorAll('.img-preview-container.new-image');
-                existingPreviews.forEach(preview => preview.remove());
-                
-                if (file) {
-                    // Validate file size (5MB limit)
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('Image size should be less than 5MB');
-                        newInput.value = '';
-                        return;
-                    }
-                    
-                    // Validate file type
-                    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                    if (!allowedTypes.includes(file.type)) {
-                        alert('Please select a valid image file (JPEG, PNG, GIF, WebP)');
-                        newInput.value = '';
-                        return;
-                    }
-                    
-                    // Create new preview container
-                    const { previewContainer, previewImg } = createPreviewContainer();
-                    
-                    // Read and display the file
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        previewContainer.classList.add('show');
-                        
-                        // If this is edit mode and we're uploading a new image
-                        if (inputId === 'editImage') {
-                            const removeImageFlag = document.getElementById('removeImageFlag');
-                            
-                            // Reset remove flag to false since we're uploading a new image
-                            if (removeImageFlag) {
-                                removeImageFlag.value = 'false';
-                            }
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    })(); // End IIFE
     </script>
 </body>
 </html> 
