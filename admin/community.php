@@ -367,8 +367,10 @@ if (strpos($message, 'Error') === 0 || strpos($message, 'failed') !== false) {
     $message_icon = 'fa-exclamation-triangle';
 }
 
-// Fetch all entries
-$entries = $conn->query('SELECT * FROM community ORDER BY created_at DESC');
+// Fetch content entries only (exclude embedded and member categories)
+$entries = $conn->query("SELECT * FROM community 
+    WHERE (category IS NULL OR category NOT IN ('embedded','faculty','executive','core','year_representative','committee'))
+    ORDER BY created_at DESC");
 
 // Get current page for active state
 $current_page = 'community';
@@ -377,7 +379,7 @@ $current_page = 'community';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Admin - Community</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -422,8 +424,6 @@ $current_page = 'community';
                             </div>
                         <?php endif; ?>
                         <span class="post-title"><?= htmlspecialchars($row['title']) ?><div class="post-meta">
-                            <span class="post-year"><?= $row['year'] ?></span>
-                            <span>-</span>
                             <span class="post-section"><?= htmlspecialchars($row['section']) ?></span>
                             </div></span>
                         <div class="post-info">
@@ -557,7 +557,8 @@ $current_page = 'community';
             <div class="members-container">
                 <?php 
                 // Fetch members from community table where category is member-related
-                $members = $conn->query('SELECT * FROM community WHERE category IN ("faculty", "executive", "core", "year_representative", "committee") ORDER BY category, display_order ASC');
+                // Note: the community table does not have display_order in schema; order by category then created_at
+                $members = $conn->query('SELECT * FROM community WHERE category IN ("faculty", "executive", "core", "year_representative", "committee") ORDER BY category ASC, created_at DESC');
                 if ($members && $members->num_rows > 0): 
                 ?>
                     <div class="members-grid">
@@ -1209,14 +1210,19 @@ $current_page = 'community';
             }
         });
         
-        // Handle existing images in edit mode
+        // Handle existing images in edit mode and allow preview on member images
         document.addEventListener('click', function(e) {
             if (e.target.closest('.img-preview-container img') || e.target.closest('.previewImageBlur')) {
                 const container = e.target.closest('.img-preview-container');
                 const img = container.querySelector('img');
                 if (img && img.src) {
                     showImagePreview(img.src);
+                    return;
                 }
+            }
+            if (e.target.classList && e.target.classList.contains('member-image')) {
+                const src = e.target.getAttribute('src');
+                if (src) showImagePreview(src);
             }
         });
 

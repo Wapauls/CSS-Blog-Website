@@ -40,19 +40,42 @@ $current_page = str_replace('.php', '', $current_file);
     const sidebar = document.getElementById('adminSidebar');
     const btn = document.getElementById('sidebarToggle');
     if(!sidebar || !btn) return;
+    const navLinks = sidebar.querySelectorAll('a');
     function updateForWidth(){
       const isMobile = window.innerWidth <= 768;
       if(isMobile){
         sidebar.classList.add('collapsed');
-        btn.classList.add('show');
+        document.body.classList.add('sidebar-collapsed');
+        btn.classList.add('show'); // show toggle on mobile only
       } else {
         sidebar.classList.remove('collapsed');
-        btn.classList.add('show');
+        document.body.classList.remove('sidebar-collapsed');
+        btn.classList.remove('show'); // hide toggle on desktop
       }
     }
     btn.addEventListener('click', function(){
       sidebar.classList.toggle('collapsed');
       document.body.classList.toggle('sidebar-collapsed');
+    });
+    // Auto-close on nav link click for mobile
+    navLinks.forEach(function(link){
+      link.addEventListener('click', function(){
+        if (window.innerWidth <= 768) {
+          sidebar.classList.add('collapsed');
+          document.body.classList.add('sidebar-collapsed');
+        }
+      });
+    });
+    // Click outside to close on mobile
+    document.addEventListener('click', function(e){
+      if (window.innerWidth <= 768 && !sidebar.classList.contains('collapsed')) {
+        const clickedInsideSidebar = sidebar.contains(e.target);
+        const clickedToggle = btn === e.target || btn.contains(e.target);
+        if (!clickedInsideSidebar && !clickedToggle) {
+          sidebar.classList.add('collapsed');
+          document.body.classList.add('sidebar-collapsed');
+        }
+      }
     });
     window.addEventListener('resize', updateForWidth);
     updateForWidth();
