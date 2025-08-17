@@ -1,0 +1,70 @@
+CREATE DATABASE IF NOT EXISTS css_blog;
+
+USE css_blog;
+CREATE TABLE IF NOT EXISTS posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS about (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS about_developers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255) NOT NULL,
+    image VARCHAR(255),
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS about_content_order (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content_type VARCHAR(50) NOT NULL,
+    content_id VARCHAR(50) NOT NULL,
+    display_order INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS community (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image VARCHAR(255),
+    section VARCHAR(10) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    year INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS news (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image VARCHAR(255),
+    event_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS developers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    roles TEXT NOT NULL,
+    fb_links TEXT NOT NULL,
+    github_links TEXT NOT NULL,
+    linkIn_links TEXT NOT NULL,
+    instagram_links TEXT NOT NULL,
+    x_links TEXT NOT NULL,
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 
+
+
