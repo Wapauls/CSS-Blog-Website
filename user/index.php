@@ -933,10 +933,11 @@ switch($current_page) {
 
 <?php elseif ($current_page === 'developers'): ?>
         <div class="developers-page">
-    <section class="developers-section">
-        <h1 class="developer-title">Meet Our Developers</h1>
-        <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
-            <?php while ($row = $dev_entries->fetch_assoc()): ?>
+            <h1 class="developer-title">Meet Our Developers</h1>
+            <section class="developers-section">
+                <div class="developers-grid">
+                    <?php if ($dev_entries && $dev_entries->num_rows > 0): ?>
+                        <?php while ($row = $dev_entries->fetch_assoc()): ?>
                 <article class="developer-card">
                     <div class="developer-name-pretext"><?= htmlspecialchars($row['title']) ?></div>
                     <?php if ($row['image']): ?>
@@ -991,14 +992,15 @@ switch($current_page) {
                         </div>
                     </div>
                 </article>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <div class="no-content">
-                <h3>Developer Profiles Coming Soon</h3>
-                <p>We're working on showcasing our amazing development team. Check back soon!</p>
-            </div>
-        <?php endif; ?>
-    </section>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="no-content">
+                            <h3>Developer Profiles Coming Soon</h3>
+                            <p>We're working on showcasing our amazing development team. Check back soon!</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
         </div>
     <?php endif; ?>
     </main>
