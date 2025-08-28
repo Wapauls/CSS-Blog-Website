@@ -10,10 +10,10 @@ ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/logs/php_errors.log');
 
 // Database configuration with error handling
-$servername = "sql201.infinityfree.com";
-$username = "if0_39690732";
-$password = "rKHfALTWwY8";
-$dbname = "if0_39690732_css_blog";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "css_blog";
 
 try {
     $conn = new mysqli($servername, $username, $password, $dbname);
