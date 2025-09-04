@@ -66,8 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && $_POST['ty
                 // Create new embedded image entry
                 $title = ucfirst(str_replace('_', ' ', $image_type)) . ' Image';
                 $content = 'Embedded image for ' . $image_type;
-                $category = 'embedded';
-                $section = $image_type;
                 
                 $stmt = $conn->prepare('INSERT INTO about (title, content, image) VALUES (?, ?, ?)');
                 if ($stmt) {
@@ -161,7 +159,7 @@ $current_page = 'about';
                     <h4>Hero Image (BLEZY.png)</h4>
                     <div class="image-upload-area" data-image-type="hero">
                         <?php
-                        $hero_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "hero" LIMIT 1');
+                        $hero_image = $conn->query('SELECT * FROM about WHERE title = "Hero Image" LIMIT 1');
                         if ($hero_image && $hero_image->num_rows > 0) {
                             $hero = $hero_image->fetch_assoc();
                         ?>
@@ -188,7 +186,7 @@ $current_page = 'about';
                     <h4>Poster Image (blezy what cs.jpg)</h4>
                     <div class="image-upload-area" data-image-type="poster">
                         <?php
-                        $poster_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "poster" LIMIT 1');
+                        $poster_image = $conn->query('SELECT * FROM about WHERE title = "Poster Image" LIMIT 1');
                         if ($poster_image && $poster_image->num_rows > 0) {
                             $poster = $poster_image->fetch_assoc();
                         ?>
@@ -215,7 +213,7 @@ $current_page = 'about';
                     <h4>BSCS Section Image (what is BSCS.jpg)</h4>
                     <div class="image-upload-area" data-image-type="bscs">
                         <?php
-                        $bscs_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "bscs" LIMIT 1');
+                        $bscs_image = $conn->query('SELECT * FROM about WHERE title = "BSCS Image" LIMIT 1');
                         if ($bscs_image && $bscs_image->num_rows > 0) {
                             $bscs = $bscs_image->fetch_assoc();
                         ?>
@@ -242,7 +240,7 @@ $current_page = 'about';
                     <h4>Enrollment Section Image (enrollment.jpg)</h4>
                     <div class="image-upload-area" data-image-type="enrollment">
                         <?php
-                        $enrollment_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "enrollment" LIMIT 1');
+                        $enrollment_image = $conn->query('SELECT * FROM about WHERE title = "Enrollment Image" LIMIT 1');
                         if ($enrollment_image && $enrollment_image->num_rows > 0) {
                             $enrollment = $enrollment_image->fetch_assoc();
                         ?>
@@ -269,7 +267,7 @@ $current_page = 'about';
                     <h4>Edusuite Section Image (edusuite.png)</h4>
                     <div class="image-upload-area" data-image-type="edusuite">
                         <?php
-                        $edusuite_image = $conn->query('SELECT * FROM about WHERE category = "embedded" AND section = "edusuite" LIMIT 1');
+                        $edusuite_image = $conn->query('SELECT * FROM about WHERE title = "Edusuite Image" LIMIT 1');
                         if ($edusuite_image && $edusuite_image->num_rows > 0) {
                             $edusuite = $edusuite_image->fetch_assoc();
                         ?>

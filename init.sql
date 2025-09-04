@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS about (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image VARCHAR(255),
+    category VARCHAR(255) DEFAULT NULL,
+    section VARCHAR(50) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

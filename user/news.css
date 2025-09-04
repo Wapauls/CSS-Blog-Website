@@ -7,6 +7,9 @@
   margin-left: auto;
   margin-right: auto;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .news-section::before {
@@ -15,10 +18,11 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
+  width: min(200px, 80vw);
   height: 2px;
   background: linear-gradient(90deg, transparent, #40E0D0, transparent);
   opacity: 0.6;
+  box-sizing: border-box;
 }
 
 .news-title {
@@ -33,9 +37,11 @@
 
 .posts { 
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
   gap: 2rem; 
-  margin-top: 2rem; 
+  margin-top: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .post { 
@@ -44,6 +50,7 @@
   overflow: hidden; 
   transition: all 0.4s ease; 
   border: 1px solid rgba(255, 255, 255, 0.15); 
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
@@ -96,6 +103,13 @@
   .news-section {
     padding: 1.5rem;
     margin-top: 80px;
+    overflow-x: hidden;
+  }
+  
+  .posts {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0;
   }
   
   .posts {

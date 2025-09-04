@@ -3,13 +3,16 @@
 .developers-page {
   margin-top: 100px;
   padding: 2rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .developer-title { 
   text-align: center; 
   margin: 1.5rem auto 2rem; 
   color: #4ee6f2; 
-  font-size: clamp(1.8rem, 4vw, 2.5rem); 
+  font-size: clamp(1.8rem, 2vw, 2.5rem); 
   font-weight: 800; 
   text-shadow: 0 0 30px rgba(78, 230, 242, 0.4); 
   position: relative; 
@@ -41,11 +44,13 @@
   margin: 0 auto; 
   display: flex;
   justify-content: center;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .developers-grid { 
   display: grid; 
-  grid-template-columns: repeat(5, 1fr); 
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
   width: 100%; 
   max-width: 1400px;
   gap: 2rem 1.5rem;
@@ -53,6 +58,7 @@
   justify-items: center;
   margin: 0 auto;
   padding: 2rem 0;
+  box-sizing: border-box;
 }
 
 .developer-card { 
@@ -460,6 +466,8 @@
     gap: 1.5rem 1rem; 
     padding: 1.5rem 0;
     max-width: 600px;
+    overflow-x: hidden;
+    box-sizing: border-box;
   }
   
   .developer-card {
@@ -473,6 +481,7 @@
   .developers-page {
     padding: 0.75rem;
     margin-top: 60px;
+    overflow-x: hidden;
   }
   
   .developer-title {
@@ -484,6 +493,8 @@
     gap: 2rem; 
     padding: 1.5rem 1rem;
     justify-items: center;
+    overflow-x: hidden;
+    box-sizing: border-box;
   } 
   
   .developer-card { 
