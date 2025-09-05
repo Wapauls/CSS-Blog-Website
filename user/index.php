@@ -928,7 +928,6 @@ switch($current_page) {
         </div>
     </section>
         </div>
-
     
 
 <?php elseif ($current_page === 'developers'): ?>
